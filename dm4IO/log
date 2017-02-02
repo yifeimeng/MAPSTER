@@ -1,0 +1,497 @@
+[Version 4
+Total size 14 MB
+Read in 3.053406e-02 s
+
+- ApplicationBounds: struct  
+ 0 
+ 0 
+ 1250 
+ 2050 
+
+- DocumentObjectList: 
+| - : 
+| | - AnnotationGroupList: 
+| | | - : 
+| | | | - AnnotationType: 31 
+| | | | - BackgroundColor: struct  
+| | | |  -1 
+| | | |  -1 
+| | | |  -1 
+| | | | 
+| | | | - BackgroundMode: 2 
+| | | | - FillMode: 2 
+| | | | - Font: 
+| | | | | - Attributes: 7 
+| | | | | - FamilyName: Lucida Console 
+| | | | | - Size: 84 
+| | | | - ForegroundColor: struct  
+| | | |  -1 
+| | | |  -1 
+| | | |  -1 
+| | | | 
+| | | | - HasBackground: 0 
+| | | | - IsMoveable: 1 
+| | | | - IsResizable: 1 
+| | | | - IsSelectable: 1 
+| | | | - IsTranslatable: 1 
+| | | | - IsVisible: 1 
+| | | | - ObjectTags: 
+| | | | - Rectangle: struct  
+| | | |  1.657500e+03 
+| | | |  120 
+| | | |  1800 
+| | | |  1020 
+| | | | 
+| | | | - TextOffsetH: 1 
+| | | | - TextOffsetV: 1 
+| | | | - TextWidth: 3.202617e+02 
+| | | | - UniqueID: 9 
+| | - AnnotationType: 20 
+| | - BackgroundColor: struct  
+| |  -1 
+| |  -1 
+| |  -1 
+| | 
+| | - BackgroundMode: 2 
+| | - FillMode: 1 
+| | - ForegroundColor: struct  
+| |  -1 
+| |  0 
+| |  0 
+| | 
+| | - HasBackground: 0 
+| | - ImageDisplayInfo: 
+| | | - BrightColor: struct  
+| | |  -1 
+| | |  -1 
+| | |  -1 
+| | | 
+| | | - Brightness: 5.000000e-01 
+| | | - CaptionOn: 0 
+| | | - CaptionSize: 10 
+| | | - CLUT: array of 256  --type:  struct structs 
+| | |  0 
+| | |  0 
+| | |  0 
+| | |  257 
+| | |  257 
+| | |  257 
+| | |  514 
+| | |  514 
+| | |  514 
+| | |  771 
+| | |  771 
+| | |  771 
+
+| | | - CLUTName: Greyscale 
+| | | - ComplexMode: 4 
+| | | - ComplexRange: 1000 
+| | | - Contrast: 5.000000e-01 
+| | | - ContrastMode: 1 
+| | | - DimensionLabels: 
+| | | | - :  
+| | | - DoAutoSurvey: 1 
+| | | - EstimatedMax: 1381 
+| | | - EstimatedMaxTrimPercentage: 1.000000e-03 
+| | | - EstimatedMin: 12984 
+| | | - EstimatedMinTrimPercentage: 1.000000e-03 
+| | | - Gamma: 5.000000e-01 
+| | | - HighLimit: 1.282537e+04 
+| | | - HiLimitContrastDeltaTriggerPercentage: 0 
+| | | - IsInverted: 0 
+| | | - LowLimit: 1381 
+| | | - LowLimitContrastDeltaTriggerPercentage: 0 
+| | | - MainSliceId: 
+| | | | - : 0 
+| | | - MinimumContrast: 0 
+| | | - RangeAdjust: 1 
+| | | - SparseSurvey_GridSize: 16 
+| | | - SparseSurvey_NumberPixels: 32 
+| | | - SparseSurvey_UseNumberPixels: 1 
+| | | - SurveyTechique: 2 
+| | - ImageDisplayType: 1 
+| | - ImageSource: 0 
+| | - IsMoveable: 1 
+| | - IsResizable: 1 
+| | - IsSelectable: 1 
+| | - IsTranslatable: 1 
+| | - IsVisible: 1 
+| | - ObjectTags: 
+| | - Rectangle: struct  
+| |  0 
+| |  0 
+| |  1223 
+| |  1.141467e+03 
+| | 
+| | - UniqueID: 8 
+- DocumentTags: 
+- HasWindowPosition: 1 
+- Image Behavior: 
+| - DoIntegralZoom: 0 
+| - ImageDisplayBounds: struct  
+|  0 
+|  0 
+|  1223 
+|  1.141467e+03 
+| 
+| - IsZoomedToWindow: 1 
+| - UnscaledTransform: 
+| | - Offset: struct  
+| |  0 
+| |  0 
+| | 
+| | - Scale: struct  
+| |  1 
+| |  1 
+| | 
+| - ViewDisplayID: 8 
+| - WindowRect: struct  
+|  0 
+|  0 
+|  1223 
+|  1142 
+| 
+| - ZoomAndMoveTransform: 
+| | - Offset: struct  
+| |  2.666626e-01 
+| |  0 
+| | 
+| | - Scale: struct  
+| |  1 
+| |  1 
+| | 
+- ImageList: 
+| - : 
+| | - ImageData: 
+| | | - Calibrations: 
+| | | | - Brightness: 
+| | | | | - Origin: 0 
+| | | | | - Scale: 1 
+| | | | | - Units:  
+| | | | - Dimension: 
+| | | | | - : 
+| | | | | | - Origin: 0 
+| | | | | | - Scale: 1 
+| | | | | | - Units:  
+| | | | | - : 
+| | | | | | - Origin: 0 
+| | | | | | - Scale: 1 
+| | | | | | - Units:  
+| | | | - DisplayCalibratedUnits: 1 
+| | | - Data: array of 137472  --type:  int32 
+| | | - DataType: 23 
+| | | - Dimensions: 
+| | | | - : 358 
+| | | | - : 384 
+| | | - PixelDepth: 4 
+| | - ImageTags: 
+| | - Name: Image Of Scan1-PACBED 
+| | - UniqueID: 
+| | | - : 383480598 
+| | | - : 1276464387 
+| | | - : 651444415 
+| | | - : 1797677920 
+| - : 
+| | - ImageData: 
+| | | - Calibrations: 
+| | | | - Brightness: 
+| | | | | - Origin: 0 
+| | | | | - Scale: 1 
+| | | | | - Units:  
+| | | | - Dimension: 
+| | | | | - : 
+| | | | | | - Origin: 0 
+| | | | | | - Scale: 1 
+| | | | | | - Units:  
+| | | | | - : 
+| | | | | | - Origin: 0 
+| | | | | | - Scale: 1 
+| | | | | | - Units:  
+| | | | - DisplayCalibratedUnits: 1 
+| | | - Data: array of 3440640  --type:  uint32 
+| | | - DataType: 11 
+| | | - Dimensions: 
+| | | | - : 1792 
+| | | | - : 1920 
+| | | - PixelDepth: 4 
+| | - ImageTags: 
+| | | - Acquisition: 
+| | | | - Device: 
+| | | | | - Active Size (pixels): struct  
+| | | | |  1920 
+| | | | |  1792 
+| | | | | 
+| | | | | - Camera Number: 0 
+| | | | | - CCD: 
+| | | | | | - Pixel Size (um): struct  
+| | | | | |  5 
+| | | | | |  5 
+| | | | | | 
+| | | | | - Configuration: 
+| | | | | | - Transpose: 
+| | | | | | | - Diagonal Flip: 1 
+| | | | | | | - Horizontal Flip: 1 
+| | | | | | | - Vertical Flip: 1 
+| | | | | - Name: K2-0001 1 
+| | | | | - Source: K2-0001 1 
+| | | | - Frame: 
+| | | | | - Area: 
+| | | | | | - Transform: 
+| | | | | | | - Class Name: cm_acquisitiontransform_list 
+| | | | | | | - Transform List: 
+| | | | | | | | - : 
+| | | | | | | | | - Binning: struct  
+| | | | | | | | |  1 
+| | | | | | | | |  1 
+| | | | | | | | | 
+| | | | | | | | | - Class Name: cm_acquisitiontransform 
+| | | | | | | | | - Sub Area Adjust: struct  
+| | | | | | | | |  0 
+| | | | | | | | |  0 
+| | | | | | | | |  0 
+| | | | | | | | |  0 
+| | | | | | | | | 
+| | | | | | | | | - Transpose: 
+| | | | | | | | | | - Diagonal Flip: 1 
+| | | | | | | | | | - Horizontal Flip: 1 
+| | | | | | | | | | - Vertical Flip: 1 
+| | | | | - CCD: 
+| | | | | | - Pixel Size (um): struct  
+| | | | | |  5 
+| | | | | |  5 
+| | | | | | 
+| | | | | - Intensity: 
+| | | | | | - Range: 
+| | | | | | | - Bias (counts): 0 
+| | | | | | | - Dark Current (counts/s): 0 
+| | | | | | | - Dark Level (counts): 0 
+| | | | | | | - Maximum Value (counts): 16777215 
+| | | | | | | - Minimum Value (counts): 0 
+| | | | | | | - Saturation Level (counts): 16777215 
+| | | | | | - Transform: 
+| | | | | | | - Class Name: cm_valuetransform_list 
+| | | | | | | - Transform List: 
+| | | | | | | | - : 
+| | | | | | | | | - Class Name: cm_valuetransform_affine 
+| | | | | | | | | - Offset: 0 
+| | | | | | | | | - Scale: 1 
+| | | | | | | | - : 
+| | | | | | | | | - ADC Max: 16777215 
+| | | | | | | | | - ADC Min: 0 
+| | | | | | | | | - Class Name: cm_valuetransform_adc 
+| | | | | - Sequence: 
+| | | | | | - Acquisition Start Time (epoch): 1426711895046 
+| | | | | | - Exposure Start (ns): -7.249378e+12 
+| | | | | | - Exposure Time (ns): 250000000 
+| | | | | | - Frame Index: 2020 
+| | | | | | - Frame Start (ns): -7.249378e+12 
+| | | | | | - Frame Time (ns): 0 
+| | | | | | - Readout Time (ns): 0 
+| | | | - Parameters: 
+| | | | | - Acquisition Write Flags: 4294967295 
+| | | | | - Base Detector: 
+| | | | | | - Class Name: cm_namedcameradetectorparameterset 
+| | | | | | - Name: default 
+| | | | | - Detector: 
+| | | | | | - continuous: 0 
+| | | | | | - exposure (s): 2.500000e-01 
+| | | | | | - hbin: 1 
+| | | | | | - height: 1792 
+| | | | | | - left: 0 
+| | | | | | - top: 0 
+| | | | | | - vbin: 1 
+| | | | | | - width: 1920 
+| | | | | - Environment: 
+| | | | | | - Mode Name: Imaging 
+| | | | | - High Level: 
+| | | | | | - Acquisition Buffer Size: 0 
+| | | | | | - Antiblooming: 0 
+| | | | | | - Binning: struct  
+| | | | | |  1 
+| | | | | |  1 
+| | | | | | 
+| | | | | | - CCD Read Area: struct  
+| | | | | |  0 
+| | | | | |  0 
+| | | | | |  1792 
+| | | | | |  1920 
+| | | | | | 
+| | | | | | - CCD Read Ports: 1 
+| | | | | | - Choose Number Of Frame Shutters Automatically: 1 
+| | | | | | - Class Name: cm_camera_highlevelparameters 
+| | | | | | - Continuous Readout: 0 
+| | | | | | - Corrections: 1 
+| | | | | | - Corrections Mask: 817 
+| | | | | | - Exposure (s): 2.500000e-01 
+| | | | | | - Number Of Frame Shutters: 1 
+| | | | | | - Processing: Unprocessed 
+| | | | | | - Quality Level: 0 
+| | | | | | - Read Frame Style: 0 
+| | | | | | - Read Mode: 0 
+| | | | | | - Secondary Shutter Post Exposure Compensation (s): 0 
+| | | | | | - Secondary Shutter Pre Exposure Compensation (s): 0 
+| | | | | | - Shutter: 
+| | | | | | | - Primary Shutter States: 0 
+| | | | | | | - Primary Shutter States Mask: 0 
+| | | | | | | - Secondary Shutter States: 0 
+| | | | | | | - Secondary Shutter States Mask: 0 
+| | | | | | | - Shutter Exposure: 0 
+| | | | | | | - Shutter Index: 0 
+| | | | | | - Shutter Post Exposure Compensation (s): 0 
+| | | | | | - Shutter Pre Exposure Compensation (s): 0 
+| | | | | | - Transform: 
+| | | | | | | - Diagonal Flip: 0 
+| | | | | | | - Horizontal Flip: 0 
+| | | | | | | - Vertical Flip: 0 
+| | | | | - Objects: 
+| | | | | | - : 
+| | | | | | | - Class Name: cm_autoexpose_acquireimage 
+| | | | | | | - Do Auto Expose: 0 
+| | | | | | | - Maximum Exposure (s): 5 
+| | | | | | | - Minimum Exposure (s): 1.000000e-01 
+| | | | | | | - Target Intensity (%): 50 
+| | | | | | | - Test Exposure (s): 1.000000e-01 
+| | | | | | - : 
+| | | | | | | - Class Name: cm_imgproc_finalcombine 
+| | | | | | | - Frame Combine Style: Copy 
+| | | | | | | - Parameter 1: 1 
+| | | | | | - : 
+| | | | | | | - Class Name: cm_stdviewerimagedisplayer 
+| | | | | | | - Do Auto Zoom: 0 
+| | | | | | | - Screen Relative Position: struct  
+| | | | | | |  1 
+| | | | | | |  0 
+| | | | | | | 
+| | | | | | | - Version: 33947648 
+| | | | | | | - View Name: Frame 
+| | | | | | | - Viewer Class: acquire 
+| | | | | | | - Window Relative Position: struct  
+| | | | | | |  1 
+| | | | | | |  0 
+| | | | | | | 
+| | | | | | | - Zoom: 1 
+| | | | | | - : 
+| | | | | | | - Class Name: cm_imgproc_histogram 
+| | | | | - Parameter Set Name: Record 
+| | | | | - Parameter Set Tag Path: Imaging:Acquire:Record 
+| | | | | - Version: 33947648 
+| | | - DataBar: 
+| | | | - Acquisition Date: 3/18/2015 
+| | | | - Acquisition Time: 1:51:41 PM 
+| | | | - Acquisition Time (OS): 130711855010766272 
+| | | | - Binning: 1 
+| | | | - Custom elements: 
+| | | | - Device Name: K2-0001 1 
+| | | | - Exposure Number: 478544 
+| | | | - Exposure Time (s): 2.500000e-01 
+| | | - Microscope Info: 
+| | | | - Cs(mm): 0 
+| | | | - Emission Current (µA): 0 
+| | | | - Formatted Indicated Mag: 5.1Mx 
+| | | | - Formatted Voltage: 300kV 
+| | | | - Illumination Mode: STEM NANOPROBE 
+| | | | - Imaging Mode: DIFFRACTION 
+| | | | - Indicated Magnification: 5100000 
+| | | | - Items: 
+| | | | | - : 
+| | | | | | - Data Type: 20 
+| | | | | | - Label: Specimen 
+| | | | | | - Tag path: Microscope Info:Specimen 
+| | | | | | - Value:  
+| | | | | - : 
+| | | | | | - Data Type: 20 
+| | | | | | - Label: Operator 
+| | | | | | - Tag path: Microscope Info:Operator 
+| | | | | | - Value: NCEM 
+| | | | | - : 
+| | | | | | - Data Type: 20 
+| | | | | | - Label: Microscope 
+| | | | | | - Tag path: Microscope Info:Microscope 
+| | | | | | - Value: TEAM I 
+| | | | - Microscope: TEAM I 
+| | | | - Name: FEI Tecnai Remote 
+| | | | - Operation Mode: SCANNING 
+| | | | - Operator: NCEM 
+| | | | - Probe Current (nA): 7.000000e-02 
+| | | | - Probe Size (nm): 1.000000e-01 
+| | | | - Specimen:  
+| | | | - STEM Camera Length: 91 
+| | | | - Voltage: 300000 
+| | - Name: Scan1-PACBED 
+| | - UniqueID: 
+| | | - : 6498267 
+| | | - : 627005459 
+| | | - : 895815493 
+| | | - : 2088245986 
+- ImageSourceList: 
+| - : 
+| | - ClassName: ImageSource:Simple 
+| | - Id: 
+| | | - : 0 
+| | - ImageRef: 1 
+- InImageMode: 1 
+- MinVersionList: 
+| - : 
+| | - RequiredVersion: 50659328 
+- NextDocumentObjectID: 10 
+- Page Behavior: 
+| - DoIntegralZoom: 0 
+| - DrawMargins: 1 
+| - DrawPaper: 1 
+| - IsFixedInPageMode: 0 
+| - IsZoomedToWindow: 1 
+| - LayedOut: 0 
+| - PageTransform: 
+| | - Offset: struct  
+| |  0 
+| |  0 
+| | 
+| | - Scale: struct  
+| |  1 
+| |  1 
+| | 
+| - RestoreImageDisplayBounds: struct  
+|  0 
+|  0 
+|  1920 
+|  1792 
+| 
+| - RestoreImageDisplayID: 8 
+| - TargetDisplayID: 4294967295 
+- PageSetup: 
+| - General: struct  
+|  1 
+|  1000 
+|  8500 
+|  11000 
+|  1000 
+|  1000 
+|  -1000 
+|  -1000 
+| 
+| - Win32: array of 60  --type:  uint8 
+| 4 
+| 0 
+| 0 
+| 0 
+
+| - Win32_DevModeW: array of 1076  --type:  uint8 
+| - Win32_DevNamesW: array of 146  --type:  uint8 
+| 4 
+| 0 
+| 34 
+| 0 
+
+- SentinelList: 
+- Thumbnails: 
+| - : 
+| | - ImageIndex: 0 
+| | - SourceSize_Pixels: struct  
+| |  1141 
+| |  1223 
+| | 
+- WindowPosition: struct  
+ 23 
+ 904 
+ 1246 
+ 2046 

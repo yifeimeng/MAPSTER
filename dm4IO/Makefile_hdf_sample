@@ -1,0 +1,23 @@
+# Edit the following variables as needed
+HDF_INSTALL = /home/yifei/Documents/MAPSTER_tools_dev/hdf5-1.8.8-mac-intel-x86_64-static
+EXTLIB = -L$(HDF_INSTALL)/lib
+CC          = gcc
+CFLAGS      = 
+LIB         = -lsz -lz -lm
+
+INCLUDE   = -I$(HDF_INSTALL)/include
+LIBSHDF   = $(EXTLIB) $(HDF_INSTALL)/lib/libhdf5.a 
+
+all: h5_write
+ 
+h5_write: h5_write.c
+	$(CC) $(CFLAGS) -o $@ h5_write.c $(INCLUDE) $(LIBSHDF) $(LIB)
+
+
+
+
+clean: 
+	rm -f *.h5 *.o
+ 
+
+.SUFFIXES:.o.c
