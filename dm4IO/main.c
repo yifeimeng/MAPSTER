@@ -45,7 +45,7 @@
  */
 #define NUM_WRITER 16
 
-/*
+
 
 void raw2HDF5(int64_t *targetTagsPositions);
 

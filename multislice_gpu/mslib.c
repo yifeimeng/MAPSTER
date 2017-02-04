@@ -9,9 +9,10 @@
 #define NUM_LORENZ 3
 #define NUM_GAUSS 3
 #define SMALL 1.0e-25
-#define NUM_PARAMS 12 // number of parameters for calculating the scattering factor
+#define NUM_FPARAM 12 // number of parameters for calculating the scattering factor
+#define MAX_NUM_ELEMENT 5
 
-void constructSupercell(FILE *fpCell, float *atomSupercell, msPara *para, sfInfo *info) {
+void constructSupercell(FILE *fpCell, float *atomSupercell, expPara *param, sfInfo *info) {
 
     char currLine[MAX_DSCRP_LENGTH];
     uint32_t ncellx, ncelly, ncellz, nAtomsUnitCell;
@@ -35,24 +36,47 @@ void constructSupercell(FILE *fpCell, float *atomSupercell, msPara *para, sfInfo
 
     ///allocate the memory to store the atom information in the whole lattice
     uint32_t totalNumAtoms = ncellx*ncelly*ncellz*nAtomsUnitCell;
-    para->totalNumAtoms = totalNumAtoms;
-    para->supercell_a = cell_a*ncellx;
-    para->supercell_b = cell_b*ncelly;
+    param->totalNumAtoms = totalNumAtoms;
+    param->supercell_a = cell_a*ncellx;
+    param->supercell_b = cell_b*ncelly;
     atomSupercell = (float *)malloc(totalNumAtoms*6*sizeof(float));
 
     ///read the atoms' infomation: atomic number, x, y, z, occupation and thermal displacement
-    for (uint32_t readIndex = 0; readIndex < nAtomsUnitCell; readIndex ++) {
-        fscanf(fpCell, "%f %f %f %f %f %f", atomInfoOneCell[readIndex], atomInfoOneCell[readIndex] + 1, atomInfoOneCell[readIndex] + 2, atomInfoOneCell[readIndex] + 3, atomInfoOneCell[readIndex] + 4, atomInfoOneCell[readIndex] + 5);
-        printf("%2f %1.5f %1.5f %1.5f %1.1f %1.3f\n", atomInfoOneCell[readIndex][0], atomInfoOneCell[readIndex][1], atomInfoOneCell[readIndex][2], atomInfoOneCell[readIndex][3], atomInfoOneCell[readIndex][4], atomInfoOneCell[readIndex][5]);
+    uint32_t elementCount = 0;
+    char elementList[MAX_NUM_ELEMENT] = {0};
+    int16_t elementIndexTable[MAX_ELEMENT_Z] = {-1};
+    char currAtomZ = 255;//this is a impossible Z for existing atoms
 
-        char currAtomZ = (char)atomInfoOneCell[readIndex][0];
-        if ((currAtomZ > 0) && (currAtomZ <= MAX_ELEMENT_Z)) {
-            if (info->isElement[currAtomZ - 1] == 0) {
-                info->nAtomType++;
-                info->isElement[currAtomZ - 1] = 1;
+    for (uint32_t readIndex = 0; readIndex < nAtomsUnitCell; readIndex ++) {
+        fscanf(fpCell, "%d %f %f %f %f %f", currAtomZ, atomInfoOneCell[readIndex] + 1, atomInfoOneCell[readIndex] + 2, atomInfoOneCell[readIndex] + 3, atomInfoOneCell[readIndex] + 4, atomInfoOneCell[readIndex] + 5);
+        printf("%2d %1.5f %1.5f %1.5f %1.1f %1.3f\n", currAtomZ, atomInfoOneCell[readIndex][1], atomInfoOneCell[readIndex][2], atomInfoOneCell[readIndex][3], atomInfoOneCell[readIndex][4], atomInfoOneCell[readIndex][5]);
+
+
+        char elementExist = 0;
+
+
+        for (uint32_t i = 0; i < MAX_NUM_ELEMENT; i++){
+            if (currAtomZ == elementList[i] {
+                elementExist = 1;
+                atomInfoOneCell[readIndex][0] = (float)i;
+                break;
             }
+
         }
+
+        if (elementExist == 0) {
+
+            elementList[elementCount] = currAtomZ;
+            elementIndexTable[currAtomZ] = (int16_t)elementCount;
+            atomInfoOneCell[readIndex][0] = (float)elementCount;
+            elementCount++;
+        }
+
+
+
     }
+
+    param->numElement = elementCount;
 
     printf("initialize the supercell\n");
     memcpy(atomSupercell, atomInfoOneCell, nAtomsUnitCell*6*sizeof(float));
@@ -113,62 +137,43 @@ void constructSupercell(FILE *fpCell, float *atomSupercell, msPara *para, sfInfo
 
 }
 
-__global__ void vzRealSpace(uint32_t numAtoms, sfInfo *info, float *atomSupercell, float *projPotential, uint32_t nx, uint32_t ny, float scale_x, float scale_y, uint32_t limit_x, uint32_t limit_y, float radMin_sq, float radMax_sq) {
+__global__ void vzRealSpace(uint32_t numAtom, atomVZ_LUT *d_elementVZ, float *d_atomSupercell, float *d_projPotential, expPara *param) {
 
-    int i = blockDim.x * blockIdx.x + threadIdx.x;
+    uint32_t ix = blockIdx.x * blockDim.x + threadIdx.x;
+	uint32_t iy = blockIdx.y * blockDim.y + threadIdx.y;
 
-    if (i < numAtoms) {
-        uint32_t atomZ = (uint32_t)*(atomSupercell + i*6 + 0);
+    for (uint32_t i = 0; i < numAtom; i++) {
+
+        uint32_t elementIndex = (uint32_t)*(atomSupercell + i*6 + 0);
         float origin_x = *(atomSupercell + i*6 + 1);
         float origin_y = *(atomSupercell + i*6 + 2);
         float occupy = *(atomSupercell + i*6 + 4);
 
-        double *spline_x = info->spline_x;
-        double *spline_y = info->spline_y[atomZ];
-        double *spline_b = info->splineCoeff[atomZ][0];
-        double *spline_c = info->splineCoeff[atomZ][1];
-        double *spline_d = info->splineCoeff[atomZ][2];
+        float distance_x = (ix * param->scale_x - origin_x);
+        float distance_y = (iy * param->scale_y - origin_y);
+        float rsq = distance_x * distance_x + distance_y * distance_y;
 
-        int32_t start_x = (uint32_t)origin_x - limit_x;
-        int32_t end_x = (uint32_t)origin_x + limit_x;
-        int32_t start_y = (uint32_t)origin_y - limit_y;
-        int32_t end_y = (uint32_t)origin_y + limit_y;
+        double *spline_x = d_elementVZ->spline_x;
+        double *spline_y = d_elementVZ->spline_y[elementIndex];
+        double *spline_b = d_elementVZ->splineCoeff[elementIndex][0];
+        double *spline_c = d_elementVZ->splineCoeff[elementIndex][1];
+        double *spline_d = d_elementVZ->splineCoeff[elementIndex][2];
 
-        float distance_x, distance_y, distance_x_sq, distance_y_sq, rsq, vz;
-        int32_t ixw, iyw;
-
-        for (int32_t ix = start_x; ix < end_x; ix++) {
-            distance_x = origin_x - (float)ix*scale_x;
-            ixw = ix;
-            distance_x_sq = distance_x*distance_x;
-            while( ixw < 0 ) ixw = ixw + nx;
-            ixw = ixw % nx;
-            for (int32_t iy = start_y; iy < end_y; iy++) {
-                    distance_y = origin_y - (float)iy*scale_y;
-                    distance_y_sq = distance_y*distance_y;
-                    rsq = distance_x_sq + distance_y_sq;
-                    if (rsq < radMax_sq) {
-                        iyw = iy;
-                        while( iyw < 0 ) iyw = iyw + ny;
-                        iyw = iyw % ny;
-                        if( rsq < radMin_sq ) rsq = radMin_sq;
-                        vz = occupy * seval(spline_x, spline_y, spline_b, spline_c, spline_d, NUM_RADIUS_SAMPLE,(double)rsq);
-                        atomicAdd(projPotential+ny*ixw + iyw, (float)vz);
-
-                    }
-
-
-
-            }
-
+        if( rsq < radMin_sq ) rsq = radMin_sq;
+        float radMax_sq = MAX_ATOM_RADIUS*MAX_ATOM_RADIUS;
+        if (rsq < radMax_sq) {
+            float vz = occupy * seval(spline_x, spline_y, spline_b, spline_c, spline_d, NUM_RADIUS_SAMPLE,(double)rsq);
+            *(projPotential + param->ny * ix + iy) += (float)vz;
         }
+
+
     }
 
 }
 
-void calculatePhaseGrating(float *atomSupercell, msPara *para, sfInfo *info) {
-    float scale_x = para->supercell_a/para->nx;
-    float scale_y = para->supercell_b/para->ny;
+void calculatePhaseGrating(float *atomSupercell, expara *param, sfInfo *info) {
+    float scale_x = param->supercell_a/param->nx;
+    float scale_y = param->supercell_b/param->ny;
 
     float radMin = 0.25 * sqrt(0.5*(scale_x*scale_x + scale_y*scale_y));
     float radMin_sq = radMin*radMin;
@@ -178,41 +183,40 @@ void calculatePhaseGrating(float *atomSupercell, msPara *para, sfInfo *info) {
     uint32_t limit_y = (uint32_t)(MAX_ATOM_RADIUS/scale_y) + 1;
 
     // For now, assume only one slice
-    // parallel the following part, use a compact spline interpolation coefficient table
 
-    uint32_t numAtoms = para->totalNumAtoms;//number of atoms in one slice
+    uint32_t numAtoms = param->totalNumAtoms;//number of atoms in one slice, may be changed
     printf("total number of atoms is %d.\n",numAtoms);
 
     cudaError_t err = cudaSuccess;
 
-    float *h_projPotential = (float *)malloc(para->nx*para->ny*sizeof(float));
+    float *h_projPotential = (float *)malloc(param->nx*param->ny*sizeof(float));
     sfInfo *h_info = info;
     float *d_projPotential = NULL;
 
-     for (uint32_t i = 0; i < para->nx*para->ny; i++) {
+     for (uint32_t i = 0; i < param->nx*param->ny; i++) {
         h_projPotential[i] = 0;
     }
 
     sfInfo *d_info = NULL;
     float *d_atomSupercell = NULL;
 
-    err = cudaMalloc((void **)&d_projPotential, para->nx*para->ny*sizeof(float));
+    err = cudaMalloc((void **)&d_projPotential, param->nx*param->ny*sizeof(float));
     err = cudaMalloc((void **)&d_info, sizeof(sfInfo));
     err = cudaMalloc((void **)&d_atomSupercell, numAtoms*sizeof(float)*6);
 
     err = cudaMemcpy(d_info, h_info, sizeof(sfInfo), cudaMemcpyHostToDevice);
-    err = cudaMemcpy(d_projPotential, h_projPotential, para->nx*para->ny*sizeof(float), cudaMemcpyHostToDevice);
+    err = cudaMemcpy(d_projPotential, h_projPotential, param->nx*param->ny*sizeof(float), cudaMemcpyHostToDevice);
     err = cudaMemcpy(d_atomSupercell, atomSupercell, numAtoms*sizeof(float)*6, cudaMemcpyHostToDevice);
 
 
-    uint32_t threadsPerBlock = 256;
-    uint32_t blocksPerGrid = (numAtoms + threadsPerBlock - 1)/threadsPerBlock;
+    dim3 dimBlock( 16, 16);
+	dim3 dimGrid( param->nx / dimBlock.x, param->ny / dimBlock.y);
 
 
-    vzRealSpace<<<blocksPerGrid, threadsPerBlock>>>(numAtoms, d_info, d_atomSupercell, d_projPotential, para->nx, para->ny, scale_x, scale_y, limit_x, limit_y, radMin_sq, radMax_sq);
+    vzRealSpace<<<dimGrid, dimBlock>>>(numAtom, d_elementVZ, d_atomSupercell, d_projPotential, param);
 
 
-    err = cudaMemcpy(h_projPotential, d_projPotential, para->nx*para->ny*sizeof(float), cudaMemcpyDeviceToHost);
+    err = cudaMemcpy(h_projPotential, d_projPotential, param->nx*param->ny*sizeof(float), cudaMemcpyDeviceToHost);
 
     err = cudaGetLastError();
     err = cudaFree(d_info);
@@ -221,6 +225,35 @@ void calculatePhaseGrating(float *atomSupercell, msPara *para, sfInfo *info) {
 
     free(h_projPotential);
 
+
+}
+
+void multislice_run() {
+
+    dim3 dimBlock( 16, 16);
+	dim3 dimGrid( param->nx / dimBlock.x, param->ny / dimBlock.y);
+
+    float2 *trans, *wave;
+    cudaMalloc((void **)&trans, param->nx*param->ny*sizeof(float2));
+    cudaMalloc((void **)&wave, param->nx*param->ny*sizeof(float2));
+    initialise<<<dimGrid, dimBlock>>>(param->nx, param->ny, trans, 0.0F, 0.0F);
+    initialise<<<dimGrid, dimBlock>>>(param->nx, param->ny, wave, 1.0F, 0.0F);
+
+    float *kx, *ky, *k2;
+    cudaMalloc((void **)&kx, param->nx*sizeof(float2));
+    cudaMalloc((void **)&ky, param->ny*sizeof(float2));
+    cudaMalloc((void **)&k2, param->nx*param->ny*sizeof(float2));
+    createKArray_1D<<<dimGrid.x, dimBlock.x>>>(param->nx, param->supercell_a, kx);
+    createKArray_1D<<<dimGrid.y, dimBlock.y>>>(param->ny, param->supercell_b, ky);
+    createKArray_2D<<<dimGrid, dimBlock>>>(param->nx, param->ny, kx, ky, k2);
+
+    float2 *propx, *propy, *propxy;
+    cudaMalloc((void **)&propx, param->nx*sizeof(float2));
+    cudaMalloc((void **)&propy, param->ny*sizeof(float2));
+    cudaMalloc((void **)&propxy, param->nx*param->ny*sizeof(float2));
+    createProp_1D<<<dimGrid.x, dimBlock.x>>>(param->nx, kx, scale, wavelen, propx);
+    createProp_1D<<<dimGrid.y, dimBlock.y>>>(param->ny, ky, scale, wavelen, propy);
+    createProp_2D<<<dimGrid, dimBlock>>> (propx, propy, propxy);
 
 }
 
@@ -233,8 +266,8 @@ void generateSplineCoeff(sfInfo *info) {
 
     printf("spline X created");
 
-    double **fparams = (double **) malloc2D( MAX_ELEMENT_Z + 1, NUM_PARAMS, sizeof(double));
-    createFparams(fparams);
+    double **fparamms = (double **) malloc2D( MAX_ELEMENT_Z + 1, NUM_FPARAM, sizeof(double));
+    createFparamms(fparamms);
     printf("sf table loaded.");
 
     for (uint32_t i = 0; i < MAX_ELEMENT_Z; i++) {
@@ -242,20 +275,20 @@ void generateSplineCoeff(sfInfo *info) {
         uint32_t Z = i + 1;// atomic number equals to index plus one.
         /// Use the look-up-table to calculate the atomic potential
         for(uint32_t j = 0; j < NUM_RADIUS_SAMPLE; j++) {
-            info->spline_y[i][j] = vzatom(Z, info->spline_x[j], fparams);
+            info->spline_y[i][j] = vzatom(Z, info->spline_x[j], fparamms);
         }
 
         /// Fit the spline
         splinh(info->spline_x, info->spline_y[i], info->splineCoeff[i][0], info->splineCoeff[i][1], info->splineCoeff[i][2], NUM_RADIUS_SAMPLE);
     }
 
-    free(fparams);
+    free(fparamms);
 
 
 }
 
 
-float vzatom(uint32_t Z, float radius, double **fparams) {
+float vzatom(uint32_t Z, float radius, double **fparamms) {
 
     double suml, sumg, x, r;
 
@@ -270,13 +303,13 @@ float vzatom(uint32_t Z, float radius, double **fparams) {
     /* Lorenztians */
     x = 2.0*pi*r;
     for(uint32_t i=0; i<2*NUM_GAUSS; i+=2 )
-        suml += fparams[Z][i]* bessk0( x*sqrt(fparams[Z][i+1]) );
+        suml += fparamms[Z][i]* bessk0( x*sqrt(fparamms[Z][i+1]) );
 
     /* Gaussians */
     x = pi*r;
     x = x*x;
     for(uint32_t i=2*NUM_GAUSS; i<2*(NUM_LORENZ+NUM_GAUSS); i+=2 )
-        sumg += fparams[Z][i]*exp(-x/fparams[Z][i+1]) / fparams[Z][i+1];
+        sumg += fparamms[Z][i]*exp(-x/fparamms[Z][i+1]) / fparamms[Z][i+1];
 
     return( al*suml + ag*sumg );
 
@@ -512,3 +545,54 @@ __device__ double seval( double *x, double *y, double *b, double *c,
     return( seval1 );
 
 } /* end seval() */
+
+
+__global__ void initialise(uint32_t nx, uint32_t ny, float2 *array, float reIni, float imIni) {
+    uint32_t ix = blockIdx.x * blockDim.x + threadIdx.x;
+	uint32_t iy = blockIdx.y * blockDim.y + threadIdx.y;
+
+	array[(ix * ny)+iy].x = reIni; //real space coordinate
+	array[(ix * ny)+iy].y = imIni; //real space coordinate
+
+}
+
+__global__ void createKArray_1D(uint32_t n, float dim, float *k) {
+    uint32_t i = blockIdx.x * blockDim.x + threadIdx.x;
+    uint32_t mid = n/2;
+
+    if (i > mid) {
+        k[i] = ((float)(i - n))/dim;
+    }
+    else {
+        k[i] = ((float)i)/dim;
+    }
+}
+
+__global__ void createKArray_2D(uint32_t nx, uint32_t ny, float *kx, float *ky, float *k2) {
+    uint32_t ix = blockIdx.x * blockDim.x + threadIdx.x;
+	uint32_t iy = blockIdx.y * blockDim.y + threadIdx.y;
+
+	k2[(iy * nx) + ix] = kx[ix] * kx[ix] + ky[iy] * ky[iy]; //k space coordinate
+
+}
+
+__global__ void createProp_1D(uint32_t n, float *k, float scale, float wavelen, float2 *prop) {
+    uint32_t i = blockIdx.x * blockDim.x + threadIdx.x;
+    float t;
+    t = scale*k[i]*k[i]*wavelen;
+    prop[i].x = acosf(t);
+    prop[i].y = asinf(t);
+
+}
+
+__global__ void createProp_2D(float2 *propx, float2 *propy, float2 propxy) {
+    uint32_t ix = blockIdx.x * blockDim.x + threadIdx.x;
+	uint32_t iy = blockIdx.y * blockDim.y + threadIdx.y;
+
+    propxy[(iy * nx) + ix].x = propx[ix].x * propy[iy].x - propx[ix].y * propy[iy].y;
+    propxy[(iy * nx) + ix].y = propx[ix].x * propy[iy].y + propx[ix].y * propy[iy].x;
+
+
+}
+
+
