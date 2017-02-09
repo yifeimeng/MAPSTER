@@ -8,7 +8,7 @@ INCLUDE	= -I$(INSTALL_PATH)/include
 LIBSHDF = $(EXTLIB)
 
 test: pinpointTagsDM4.o main.o 
-	$(CC) $? -o $@ 
+	$(CC) $? -o $@ $(LIBSHDF) -lhdf5 
 main.o:
 	$(CC) $(CFLAGS) -c main.c -o $@ $(INCLUDE)
 

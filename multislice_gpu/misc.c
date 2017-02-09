@@ -3,6 +3,25 @@
 #include "misc.h"
 #include <stdio.h>
 
+void displayParam(expPara *param) {
+    printf("parameters:\n");
+    printf("nx:%d\n", param->nx);
+    printf("ny:%d\n", param->ny);
+    printf("supercell_a:%f\n", param->supercell_a);
+    printf("supercell_b:%f\n", param->supercell_b);
+    printf("supercell_c:%f\n", param->supercell_c);
+    printf("deltaZ:%f\n", param->deltaZ);
+    printf("number of elements:%d\n", param->numElement);
+    printf("total number of atoms:%d\n", param->totalNumAtom);
+    printf("the scale x: %f\n", param->scale_x);
+    printf("the scale y: %f\n", param->scale_y);
+    printf("the radMin_sq: %f\n", param->radMin_sq);
+    printf("the radMax_sq: %f\n", param->radMax_sq);
+
+
+}
+
+
 /*---------------------------- malloc1D() -------------------------------*/
 /*
     1D array allocator for arbitrary type

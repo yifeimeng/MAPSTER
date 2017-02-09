@@ -2,7 +2,7 @@
 INSTALL_PATH = /usr/local/cuda
 EXTLIB = -L$(INSTALL_PATH)/lib64
 CC	= nvcc
-CFLAGS	= -x cu
+CFLAGS	= -x cu -Wno-deprecated-gpu-targets
 
 INCLUDE	= -I$(INSTALL_PATH)/include
 LIBSHDF = $(EXTLIB)
