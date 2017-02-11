@@ -7,7 +7,7 @@ CFLAGS	= -x cu -Wno-deprecated-gpu-targets
 INCLUDE	= -I$(INSTALL_PATH)/include
 LIBSHDF = $(EXTLIB)
 
-test: mslib.o misc.o main.o  
+test: pgma_io.o mslib.o misc.o main.o  
 	$(CC) $? -o $@ $(LIBSHDF) -lcuda -lcudart 
 main.o:
 	$(CC) $(CFLAGS) -c main.c -o $@ $(INCLUDE)
@@ -17,6 +17,9 @@ mslib.o:
 
 misc.o:
 	$(CC) $(CFLAGS) -c misc.c -o $@ $(INCLUDE)
+
+pgma_io.o:
+	$(CC) $(CFLAGS) -c pgma_io.c -o $@ $(INCLUDE)
 	 
 
 clean: 

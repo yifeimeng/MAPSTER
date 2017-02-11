@@ -15,8 +15,8 @@ int main() {
     printf("generate spline coeff successful.\n");
 
     ///initialize some parameters manually
-    param->nx = 512;
-    param->ny = 512;
+    param->nx = 256;
+    param->ny = 256;
     param->deltaZ = 1.95255;
 
     ///load the unit cell file
@@ -59,13 +59,36 @@ int main() {
     param->supercell_a = cell_a*(float)ncellx;
     param->supercell_b = cell_b*(float)ncelly;
     param->supercell_c = cell_c*(float)ncellz;
-    float *atomSupercell = (float *)malloc(param->totalNumAtom*6*sizeof(float));
 
-    ///construct the supercell
+    ///construct the supercell (not sorted)
+    float *atomSupercell = (float *)malloc(param->totalNumAtom*6*sizeof(float));
     constructSupercell(fpCell, atomSupercell, atomUnitCell, param, atomVZ_all, atomVZ);
     printf("construct supercell successful.\n");
 
-    ///slice the whole supercell
+    ///check the atomVZ look up table
+    for (uint32_t i = 0; i < 100; i ++) {
+
+        printf("%f ",atomVZ->spline_y[0][i]);
+
+    }
+    printf("\n");
+
+    ///sort the supercell according to the z position
+    float *atomSupercell_sorted = (float *)malloc(param->totalNumAtom*6*sizeof(float));
+    memcpy(atomSupercell_sorted, atomSupercell, param->totalNumAtom*6*sizeof(float));
+    heapsort(atomSupercell_sorted, param->totalNumAtom, 6, 4);// the z position is the 4th data in a block
+
+    ///check the sorted supercell
+    printf("check the sorted supercell.\n");
+    for (uint32_t i = 0; i < param->totalNumAtom; i ++) {
+        for (uint32_t j = 0; j < 6; j ++){
+            printf("%f ", *(atomSupercell_sorted + i*6 + j));
+        }
+        printf("\n");
+
+    }
+
+    ///slice the sorted supercell
     displayParam(param);
     param->numSlice = (uint32_t)(param->supercell_c/param->deltaZ + 0.5);//round the float number to integer
     printf("the number of slice is %d.\n", param->numSlice);
@@ -73,11 +96,15 @@ int main() {
     uint32_t *startPointList, *numAtomList;
     startPointList = (uint32_t *)malloc(param->numSlice*sizeof(uint32_t));
     numAtomList = (uint32_t *)malloc(param->numSlice*sizeof(uint32_t));
-    sliceSupercell(atomSupercell, param, startPointList, numAtomList);
-    printf("slice sample successful.\n");
+    sliceSupercell(atomSupercell_sorted, param, startPointList, numAtomList);
+    printf("check slices:\n");
+    for (uint32_t i = 0; i < param->numSlice; i ++) {
+        printf("slice %d: start point %d, number of atom %d\n", i, startPointList[i], numAtomList[i]);
+    }
+
 
     ///run the multislice, the phase grating is calculated on the fly
-    //multislice_run(atomSupercell, param, atomVZ, startPointList, numAtomList);
+    multislice_run(atomSupercell_sorted, param, atomVZ, startPointList, numAtomList);
 
     fclose(fpCell);
     free(param);

@@ -3,6 +3,7 @@
 # include <math.h>
 
 # include "pgma_io.h"
+#define MAX_LINE_LENGTH 255
 
 /******************************************************************************/
 
@@ -363,21 +364,20 @@ void pgma_read_header ( FILE *file_in, int *xsize, int *ysize, int *maxg )
     Output, int *MAXG, the maximum gray value.
 */
 {
-# define LINE_MAX 255
 
   int count;
   char *error;
-  char line[LINE_MAX];
+  char line[MAX_LINE_LENGTH];
   char *next;
   int step;
   int width;
-  char word[LINE_MAX];
+  char word[MAX_LINE_LENGTH];
 
   step = 0;
 
   while ( 1 )
   {
-    error = fgets ( line, LINE_MAX, file_in );
+    error = fgets ( line, MAX_LINE_LENGTH, file_in );
 
     if ( !error )
     {
@@ -449,7 +449,7 @@ void pgma_read_header ( FILE *file_in, int *xsize, int *ysize, int *maxg )
   }
 
   return;
-# undef LINE_MAX
+
 }
 /******************************************************************************/
 

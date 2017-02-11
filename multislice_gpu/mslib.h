@@ -10,6 +10,11 @@
 #define MAX_NUM_ELEMENT 5 // max number of element type in the material
 #define NUM_RADIUS_SAMPLE 100 // sample point of the atomic potential look up table
 
+struct temPara {
+
+
+};
+
 struct expPara {
     uint32_t nx;//(pixel) size of output image
     uint32_t ny;//(pixel) size of output image

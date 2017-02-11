@@ -1,8 +1,8 @@
 #include "mslib.h"
 #include "misc.h"
+#include "pgma_io.h"
 #include <cuda.h>
 #include <cuda_profiler_api.h>
-
 
 #define MAX_ATOM_RADIUS 3.0 //max atomic radius in the unit of Angstrom
 #define MIN_ATOM_RADIUS 0.01 //min atomic radius in the unit of Angstrom
@@ -11,45 +11,65 @@
 #define SMALL 1.0e-25
 #define NUM_FPARAM 12 // number of parameters for calculating the scattering factor
 
+void makeProbe(float2 *probe, expPara *param) {
+
+}
+
 void constructSupercell(FILE *fpCell, float *atomSupercell, float *atomUnitCell, expPara *param, atomVZ_LUT_all *atomVZ_all, atomVZ_LUT *atomVZ) {
 
     ///read the atomic number, x, y, z, occupation and thermal displacement
+    uint8_t *Z = (uint8_t *)malloc(param->numAtomUnitCell*sizeof(uint8_t));//Z is always smaller than 255
+
+    for (uint32_t i = 0; i < param->numAtomUnitCell; i ++) {
+        fscanf(fpCell, "%d %f %f %f %f %f", Z+i, atomUnitCell+i*6+1, atomUnitCell+i*6+2, atomUnitCell+i*6+3, atomUnitCell+i*6+4, atomUnitCell+i*6+5);
+        printf("%2d %1.5f %1.5f %1.5f %1.1f %1.3f\n", Z[i], atomUnitCell[i*6+1], atomUnitCell[i*6+2], atomUnitCell[i*6+3], atomUnitCell[i*6+4], atomUnitCell[i*6+5]);
+
+    }
+
+    uint8_t elementExist;
     uint32_t elementCount = 0;
     uint8_t elementList[MAX_NUM_ELEMENT] = {0};
-    uint8_t currAtomZ = 255;//this is a impossible Z for existing atoms
-    uint8_t elementExist;
 
-
-    for (uint32_t readIndex = 0; readIndex < param->numAtomUnitCell; readIndex ++) {
-        fscanf(fpCell, "%d %f %f %f %f %f", &currAtomZ, atomUnitCell+readIndex*6+1, atomUnitCell+readIndex*6+2, atomUnitCell+readIndex*6+3, atomUnitCell+readIndex*6+4, atomUnitCell+readIndex*6+5);
-        printf("%2d %1.5f %1.5f %1.5f %1.1f %1.3f\n", currAtomZ, atomUnitCell[readIndex*6+1], atomUnitCell[readIndex*6+2], atomUnitCell[readIndex*6+3], atomUnitCell[readIndex*6+4], atomUnitCell[readIndex*6+5]);
+    for (uint32_t i = 0; i < param->numAtomUnitCell; i++) {
 
         elementExist = 0;
-
-
-        for (uint32_t i = 0; i < MAX_NUM_ELEMENT; i++){
-            if (currAtomZ == elementList[i]) {
+        for (uint32_t j = 0; j < MAX_NUM_ELEMENT; j++){
+            if (Z[i] == elementList[j]) {
                 elementExist = 1;
-                atomUnitCell[readIndex*6] = (float)i;
+                atomUnitCell[i*6] = (float)j;
+                break;
             }
 
         }
 
         if (elementExist == 0) {
 
-            elementList[elementCount] = currAtomZ;
-            atomUnitCell[readIndex*6] = (float)elementCount;
+            elementList[elementCount] = Z[i];
+            atomUnitCell[i*6] = (float)elementCount;
 
             ///construct the look up table for atomic potentials of existing elements
-            memcpy(atomVZ->splineCoeff[elementCount], atomVZ_all->splineCoeff[currAtomZ], 3*NUM_RADIUS_SAMPLE*sizeof(double));
-            memcpy(atomVZ->spline_y[elementCount], atomVZ_all->spline_y[currAtomZ], NUM_RADIUS_SAMPLE*sizeof(double));
+            memcpy(atomVZ->splineCoeff[elementCount], atomVZ_all->splineCoeff[Z[i]], 3*NUM_RADIUS_SAMPLE*sizeof(double));
+            memcpy(atomVZ->spline_y[elementCount], atomVZ_all->spline_y[Z[i]], NUM_RADIUS_SAMPLE*sizeof(double));
 
             elementCount++;
         }
+    }
 
-
+    ///check the element list
+    for (uint32_t i = 0; i < elementCount; i ++) {
+        printf("Atom %d is %d\n", i, elementList[i]);
 
     }
+    ///check the unit cell
+    printf("check the unit cell.\n");
+    for (uint32_t i = 0; i < param->numAtomUnitCell; i ++) {
+        for (uint32_t j = 0; j < 6; j ++){
+            printf("%f ", *(atomUnitCell + i*6 + j));
+        }
+        printf("\n");
+
+    }
+
 
 
     memcpy(atomVZ->spline_x, atomVZ_all->spline_x, NUM_RADIUS_SAMPLE*sizeof(double));
@@ -109,9 +129,9 @@ void constructSupercell(FILE *fpCell, float *atomSupercell, float *atomUnitCell,
 
     ///check the constructed supercell
     printf("check the supercell.\n");
-    for (uint32_t readIndex = 0; readIndex < param->totalNumAtom; readIndex ++) {
-        for (uint32_t i = 0; i < 6; i++){
-            printf("%f ", *(atomSupercell + readIndex*6 + i));
+    for (uint32_t i = 0; i < param->totalNumAtom; i ++) {
+        for (uint32_t j = 0; j < MAX_NUM_ELEMENT; j ++){
+            printf("%f ", *(atomSupercell + i*6 + j));
         }
         printf("\n");
 
@@ -207,8 +227,6 @@ void multislice_run(float *atomSupercell, expPara *param, atomVZ_LUT *elementVZ,
     err = cudaMalloc((void **)&d_atomSupercell, param->totalNumAtom*sizeof(float)*6);
     err = cudaMemcpy(d_atomSupercell, atomSupercell, param->totalNumAtom*sizeof(float)*6, cudaMemcpyHostToDevice);
 
-
-
     ///initialize the projected potential
     float *h_projPotential = (float *)malloc(param->nx*param->ny*sizeof(float));
     float *d_projPotential = NULL;
@@ -221,14 +239,13 @@ void multislice_run(float *atomSupercell, expPara *param, atomVZ_LUT *elementVZ,
     err = cudaMemcpy(d_projPotential, h_projPotential, param->nx*param->ny*sizeof(float), cudaMemcpyHostToDevice);
 
     ///copy the parameters and LUT into the constant memory of the device
-    cudaMemcpyToSymbol(d_param, param, sizeof(expPara), cudaMemcpyHostToDevice);
-    cudaMemcpyToSymbol(d_elementVZ, elementVZ, sizeof(atomVZ_LUT), cudaMemcpyHostToDevice);
+    err = cudaMemcpyToSymbol(d_param, param, sizeof(expPara), 0, cudaMemcpyHostToDevice);
+    err = cudaMemcpyToSymbol(d_elementVZ, elementVZ, sizeof(atomVZ_LUT), 0, cudaMemcpyHostToDevice);
 
     ///perform the multislice calculation
     for (uint32_t i = 0; i < param->numSlice; i++) {
-        ///number of atoms in one slice, may be changed
-        printf("total number of atoms in this slice is %d.\n",numAtomList[i]);
 
+        printf("%d atoms start at %d.\n", numAtomList[i], startPointList[i]);
         ///use the real space method to calculate the projected potential
         vzRealSpace<<<dimGrid, dimBlock>>>(numAtomList[i], startPointList[i], d_atomSupercell, d_projPotential);
 
@@ -236,6 +253,30 @@ void multislice_run(float *atomSupercell, expPara *param, atomVZ_LUT *elementVZ,
 
 
     }
+
+    err = cudaMemcpy(h_projPotential, d_projPotential, param->nx*param->ny*sizeof(float), cudaMemcpyDeviceToHost);
+
+    uint32_t numPixel = param->nx * param->ny;
+
+    ///check the projected potential calculated
+    /*
+    for (uint32_t i = 0; i < param->nx; i ++) {
+        for (uint32_t j = 0; j < param->ny; j ++) {
+            printf("%f ", h_projPotential[i*param->ny+j]);
+
+        }
+        printf("\n");
+
+    }
+
+
+
+    int32_t *projPotential_grey = (int32_t *)malloc(numPixel*sizeof(int32_t));
+    mat2grey(h_projPotential, projPotential_grey, numPixel);
+
+    char *imageName = "pImage.pgm";
+    pgma_write(imageName, (int32_t)param->nx, (int32_t)param->ny, projPotential_grey);
+    */
 
 
 
@@ -260,18 +301,22 @@ void sliceSupercell(float *atomSupercell, expPara *param, uint32_t *startPointLi
 
     float zslice = 0.95*param->deltaZ;//set the limit slightly lower than than the actual boundary for float number comparison
     uint32_t i_slice = 0;
+    startPointList[0] = 0;
 
     printf("zslice is %f.\n", zslice);
     for (uint32_t i = 0;i < param->totalNumAtom; i++) {
-        printf("current z is :%f\n", atomSupercell[i*6+3]);
+        //printf("current z is :%f\n", atomSupercell[i*6+3]);
         if (atomSupercell[i*6+3] > zslice) {
-            startPointList[i_slice] = i;
-            if (i_slice > 0)
-                numAtomList[i_slice] = i - startPointList[i_slice - 1];
-            else
-                numAtomList[i_slice] = i;
+            startPointList[i_slice + 1] = i;
+            numAtomList[i_slice] = i - startPointList[i_slice];
             i_slice++;
             zslice += param->deltaZ;
+        }
+
+        //when processing the last atom
+        if (i == param->totalNumAtom - 1) {
+
+            numAtomList[i_slice] = i - startPointList[i_slice] + 1;
         }
 
     }

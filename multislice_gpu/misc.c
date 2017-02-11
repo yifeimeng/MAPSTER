@@ -3,6 +3,130 @@
 #include "misc.h"
 #include <stdio.h>
 
+/*--------------------- wavelength() -----------------------------------*/
+/*
+    return the electron wavelength (in Angstroms)
+    keep this is one place so I don't have to keep typing in these
+    constants (that I can never remember anyhow)
+
+    ref: Physics Vade Mecum, 2nd edit, edit. H. L. Anderson
+        (The American Institute of Physics, New York) 1989
+        page 4.
+
+    kev = electron energy in keV
+
+*/
+
+double wavelength( double kev )
+{
+    double w;
+    const double emass=510.99906; /* electron rest mass in keV */
+    const double hc=12.3984244; /* Planck's const x speed of light*/
+
+    /* electron wavelength in Angstroms */
+    w = hc/sqrt( kev * ( 2*emass + kev ) );
+
+    return( w );
+
+}  /* end wavelength() */
+
+void mat2grey(float *mat, int32_t *grey, uint32_t numPixel) {
+    float min, max;
+    min = mat[0];
+    max = mat[0];
+    for (uint32_t i = 1; i < numPixel; i ++) {
+        if (mat[i] < min) min = mat[i];
+        if (mat[i] > max) max = mat[i];
+    }
+
+    float scale = (max - min)/255; // This number is subject to change depending on the grey scale you use
+
+    for (uint32_t i = 0; i < numPixel; i ++) {
+        int32_t greyValue;
+        greyValue = int32_t((mat[i] - min)/scale + 0.5);
+        grey[i] = greyValue;
+
+    }
+
+}
+
+
+/*
+    compare node i with its left child j and right child k
+    find the max node within i, j, and k.
+    the limit is n
+*/
+
+uint32_t max(float *a, int32_t n, int32_t i, int32_t j, int32_t k, uint32_t sizeBlock, uint32_t ref) {
+    int32_t m = i;
+    if (j < n && a[j * sizeBlock + ref - 1] > a[m * sizeBlock + ref - 1]) {
+        m = j;
+    }
+    if (k < n && a[k * sizeBlock + ref - 1] > a[m * sizeBlock + ref - 1]) {
+        m = k;
+    }
+    return m;
+}
+
+
+/*
+    heapdown the node i
+    the ending point is n
+*/
+
+
+void heapdown(float *a, int32_t n, int32_t i, uint32_t sizeBlock, uint32_t ref) {
+    while (1) {
+        int32_t j = max(a, n, i, 2 * i + 1, 2 * i + 2, sizeBlock, ref);
+        if (j == i) {
+            break;// break if the node is at the correct position
+        }
+        //move down the node if it doesn't satisfy the heap requirement
+        float temp[sizeBlock];
+        memcpy(temp, a + i * sizeBlock, sizeBlock*sizeof(float));
+        memcpy(a + i * sizeBlock, a + j * sizeBlock, sizeBlock*sizeof(float));
+        memcpy(a + j * sizeBlock, temp, sizeBlock*sizeof(float));
+        i = j;
+
+    }
+
+
+}
+
+/*
+    Sort the array using heap sort.
+    sizeBlock = number of data in a data block.
+    the array is sorted on the unit of data block.
+    ref = the data to be compared in the data block.
+    n = total number of blocks
+    a = input array
+*/
+
+void heapsort(float *a, int32_t n, uint32_t sizeBlock, uint32_t ref) {
+    int32_t i;
+
+    for (i = (n - 2) / 2; i >= 0; i --) {
+        heapdown(a, n, i, sizeBlock, ref);
+
+    }
+
+    for (i = 0; i < n; i ++) {
+        float temp[sizeBlock];
+        memcpy(temp, a + (n - i - 1)*sizeBlock, sizeBlock*sizeof(float));
+        memcpy(a + (n - i - 1)*sizeBlock, a, sizeBlock*sizeof(float));
+        memcpy(a, temp, sizeBlock*sizeof(float));
+        heapdown(a, n - i - 1, 0, sizeBlock, ref);
+
+    }
+
+}
+
+
+/*
+    Display the content of param. Used for debug.
+
+*/
+
 void displayParam(expPara *param) {
     printf("parameters:\n");
     printf("nx:%d\n", param->nx);
