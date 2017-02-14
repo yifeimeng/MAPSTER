@@ -10,8 +10,10 @@
 #define MAX_NUM_ELEMENT 5 // max number of element type in the material
 #define NUM_RADIUS_SAMPLE 100 // sample point of the atomic potential look up table
 
-struct temPara {
-
+struct probePara {
+    uint32_t pOAPERT; // objective aperture semi-angle in radians
+    uint32_t pDDF; //defocus spread in Angstroms
+    uint32_t pSource; // source size in Angstroms
 
 };
 
@@ -43,6 +45,7 @@ struct expPara {
     float radMin_sq;
     float radMax_sq;
     uint32_t numSlice;
+    cufftHandle fft_plan;
 
 };
 
