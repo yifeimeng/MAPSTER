@@ -15,7 +15,7 @@
 
 
 #define NUM_TARGET_TAGS 5
-#define DM4_FILE_NAME "/home/yifei/Documents/test_data/CPC-15.dm4"
+#define DM4_FILE_NAME "/home/yifei/Documents/test_data/STOPTO-test.dm4"
 #define HDF5_FILE_NAME_LENGTH 30
 #define HDF5_FILE_NAME "hdf5_test"
 /*
