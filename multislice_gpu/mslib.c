@@ -10,6 +10,7 @@
 #define NUM_GAUSS 3
 #define SMALL 1.0e-25
 #define NUM_FPARAM 12 // number of parameters for calculating the scattering factor
+#define NGH 9
 
 /*------------------------ chi() ---------------------*/
 /*  return the aberration function
@@ -86,7 +87,7 @@ double chi(float p[], double alx, double aly, int multiMode) {
 }
 
 
-__global__ void calculateProbeWave(float2 *probe, float *pAberr, float k2max, uint8_t multiMode, float *d_kx, float *d_ky, float *d_k2, float xp, float yp) {
+__global__ void calculateProbeWave(float2 *probeWave, float *pAberr, float k2max, uint8_t multiMode, float *d_kx, float *d_ky, float *d_k2, float xp, float yp) {
 
     uint32_t ix = blockIdx.x * blockDim.x + threadIdx.x;
 	uint32_t iy = blockIdx.y * blockDim.y + threadIdx.y;
@@ -101,16 +102,16 @@ __global__ void calculateProbeWave(float2 *probe, float *pAberr, float k2max, ui
         float dy2p = 2.0*PI*yp;
 
         chi0 = (2.0*PI/d_param->wavelen)*chi(pAberr, alx, aly, multiMode) - ((dx2p*d_kx[ix])+(dy2p*d_ky[iy]));
-        probe[i].x = _cosf(chi0);
-        probe[i].y = _sinf(chi0);
+        probeWave[i].x = _cosf(chi0);
+        probeWave[i].y = _sinf(chi0);
 
 	}
 	else {
-        probe[i].x = 0.0;
-        probe[i].y = 0.0;
+        probeWave[i].x = 0.0;
+        probeWave[i].y = 0.0;
 	}
 
-    cufftExecC2C(d_param->fft_plan, (cufftComplex *)probe, (cufftComplex *)probe, CUFFT_INVERSE);
+
 
 
 
@@ -118,10 +119,20 @@ __global__ void calculateProbeWave(float2 *probe, float *pAberr, float k2max, ui
 
 
 
-void makeProbe(float2 *probe, expPara *param, probePara *paramProbe) {
+void makeProbe(float2 *h_probe, expPara *param, float *p) {
+
+    double xGH[]={ 3.190993201781528, 2.266580584531843, 1.468553289216668,
+        0.723551018752838, 0.000000000000000, -0.723551018752838,
+        -1.468553289216668,-2.266580584531843,-3.190993201781528};
+    double wGH[]={3.960697726326e-005, 4.943624275537e-003 ,8.847452739438e-002,
+        4.326515590026e-001, 7.202352156061e-001, 4.326515590026e-001,
+        8.847452739438e-002, 4.943624275537e-003, 3.960697726326e-005};
 
     param->wavelen = wavelength(param->electronV); // calculate the wavelength
     sigmae = sigma( keV )/ 1000.0;
+
+    float2 *d_probeWave;
+    cudaMalloc((void **)&d_probeWave, param->nx*param->ny*sizeof(float2));
 
     float *d_kx, *d_ky, *d_k2;
     cudaMalloc((void **)&d_kx, param->nx*sizeof(float2));
@@ -131,31 +142,71 @@ void makeProbe(float2 *probe, expPara *param, probePara *paramProbe) {
     createKArray_1D<<<dimGrid.y, dimBlock.y>>>(param->ny, param->supercell_b, d_ky);
     createKArray_2D<<<dimGrid, dimBlock>>>(param->nx, param->ny, d_kx, d_ky, d_k2);
 
-    float k2max = (paramProbe->pOAPERT/param->wavelen)*(param->pOAPERT/param->wavelen);
+    float k2max = (p[pOAPERT]/param->wavelen)*(p[pOAPERT]/param->wavelen);
 
     float ddf2, df;
     uint32_t ndf;
-    if (paramProbe->pDDF > 1.0) {
-        ddf2 = sqrt(log(2.0)/(paramProbe->pDDF*paramProbe->pDDF/4.0));
-        for (uint32_t idf = 0; idf < NGH; idf ++) {
-
-            df = param->df0 + xGH[idf]/ddf2;
-            weight = (float) wGH[idf];
-            calculateProbeWave<<<dimGrid, dimBlock>>>(probe, pProbe, k2max, multiMode, d_kx, d_ky, d_k2, xp, yp);
-
-            //calculate probe intensity
-        }
+    if (p[pDDF] > 1.0) {
+        ndf = NGH;
+        ddf2 = sqrt(log(2.0)/(p[pDDF]*p[pDDF]/4.0));
     }
     else {
         ndf = 1;
         ddf2 = 0;
     }
 
-    // calculate the ctf function
+    for (uint32_t idf = 0; idf < ndf; idf ++) {
+        if (ndf > 1) {
+
+        df = param->df0 + xGH[idf]/ddf2;
+        weight = (float) wGH[idf];
+        }
+        else {
+            df = param->df0;
+            weight = 1.0;
+        }
+
+        dim3 dimBlock( 16, 16);
+        dim3 dimGrid( param->nx / dimBlock.x, param->ny / dimBlock.y);
+        calculateProbeWave<<<dimGrid, dimBlock>>>(d_probeWave, p, k2max, multiMode, d_kx, d_ky, d_k2, xp, yp);
+
+        cufftExecC2C(d_param->fft_plan, (cufftComplex *)d_probeWave, (cufftComplex *)d_probeWave, CUFFT_INVERSE);
+
+        // calculate probe intensity at each pixel
+        float *pixsq;
+        module<<<dimGrid, dimBlock>>>(d_probeWave, d_pixsq);
+        // normalize the probe
+        float d_sum;
+        float *ctf;
+        reduceArray<<<1, param->nx*param->ny>>>(d_pixsq, &d_sum, param->nx*param->ny);
+        scale = weight * ((float)sqrt( 1.0 / d_sum ) );
+
+        scaleReal<<<dimGrid, dimBlock>>>(d_pixsq, d_pixsq, float scale);
+        addReal<<<dimGrid, dimBlock>>>(d_ctf, d_pixsq, d_ctf);
 
 
-    // normalize the ctf function
+    }
 
+    /// convolve with the probe
+    if (dsource > 0.001) {
+    float2 *temp;
+    real2Complex<<<dimGrid, dimBlock>>>(d_ctf, d_temp, param->nx*param->ny);
+    cufftExecC2C(d_param->fft_plan, (cufftComplex *)d_temp, (cufftComplex *)d_temp, CUFFT_FORWARD);
+    dsource = 0.5* dsource;   // convert diameter to radius
+    ds = pi*pi * dsource*dsource/log(2.0);  // source size factor- convert to FWHM
+    scaleComplex<<<dimGrid, dimBlock>>>(d_temp, d_temp, ds);
+    cufftExecC2C(d_param->fft_plan, (cufftComplex *)d_temp, (cufftComplex *)d_temp, CUFFT_INVERSE);
+    complex2real<<<dimGrid, dimBlock>>>(d_temp, d_ctf, param->nx*param->ny);
+
+    }
+
+    reduceArray<<<1, param->nx*param->ny>>>(d_ctf, &d_sum, param->nx*param->ny);
+    scale = weight * ((float)sqrt( 1.0 / d_sum ) );
+    scaleReal<<<dimGrid, dimBlock>>>(d_ctf, d_ctf, float scale);
+
+    real2complex<<<dimGrid, dimBlock>>>(d_ctf, d_probe, param->nx*param->ny);
+
+    cudaMemcpy(h_probe, d_probe, param->nx*param->ny*sizeof(float2), cudaMemcpyDeviceToHost);
 
 }
 
@@ -347,8 +398,8 @@ void multislice_run(float *atomSupercell, expPara *param, atomVZ_LUT *elementVZ,
     float2 *d_trans, *d_wave;
     cudaMalloc((void **)&d_trans, param->nx*param->ny*sizeof(float2));
     cudaMalloc((void **)&d_wave, param->nx*param->ny*sizeof(float2));
-    initialise<<<dimGrid, dimBlock>>>(param->nx, param->ny, d_trans, 0.0F, 0.0F);
-    initialise<<<dimGrid, dimBlock>>>(param->nx, param->ny, d_wave, 1.0F, 0.0F);
+    initialiseComplex<<<dimGrid, dimBlock>>>(param->nx, param->ny, d_trans, 0.0F, 0.0F);
+    initialiseComplex<<<dimGrid, dimBlock>>>(param->nx, param->ny, d_wave, 1.0F, 0.0F);
 
     float *d_kx, *d_ky, *d_k2;
     cudaMalloc((void **)&d_kx, param->nx*sizeof(float2));
@@ -757,7 +808,7 @@ __device__ double seval( double *x, double *y, double *b, double *c,
 } /* end seval() */
 
 
-__global__ void initialise(uint32_t nx, uint32_t ny, float2 *array, float reIni, float imIni) {
+__global__ void initialiseComplex(uint32_t nx, uint32_t ny, float2 *array, float reIni, float imIni) {
     uint32_t ix = blockIdx.x * blockDim.x + threadIdx.x;
 	uint32_t iy = blockIdx.y * blockDim.y + threadIdx.y;
 

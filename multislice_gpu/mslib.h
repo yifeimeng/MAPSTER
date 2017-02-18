@@ -10,11 +10,22 @@
 #define MAX_NUM_ELEMENT 5 // max number of element type in the material
 #define NUM_RADIUS_SAMPLE 100 // sample point of the atomic potential look up table
 
-struct probePara {
-    uint32_t pOAPERT; // objective aperture semi-angle in radians
-    uint32_t pDDF; //defocus spread in Angstroms
-    uint32_t pSource; // source size in Angstroms
+// Utility class used to avoid linker errors with extern
+// unsized shared memory arrays with templated type
+template<class T>
+struct SharedMemory
+{
+    __device__ inline operator       T *()
+    {
+        extern __shared__ int __smem[];
+        return (T *)__smem;
+    }
 
+    __device__ inline operator const T *() const
+    {
+        extern __shared__ int __smem[];
+        return (T *)__smem;
+    }
 };
 
 struct expPara {
@@ -71,7 +82,7 @@ void splinh( double *x, double *y, double *b, double *c, double *d, uint32_t n);
 double bessk0( double x );
 double bessi0( double x );
 __device__ double seval( double *x, double *y, double *b, double *c, double *d, int n, double x0 );
-__global__ void initialise(uint32_t nx, uint32_t ny, float2 *array, float reIni, float imIni);
+__global__ void initialiseComplex(uint32_t nx, uint32_t ny, float2 *array, float reIni, float imIni);
 __global__ void createKArray_1D(uint32_t n, float dim, float *k);
 __global__ void createKArray_2D(uint32_t nx, uint32_t ny, float *d_kx, float *d_ky, float *d_k2);
 __global__ void createProp_1D(uint32_t n, float *k, float scale, float wavelen, float2 *prop);
