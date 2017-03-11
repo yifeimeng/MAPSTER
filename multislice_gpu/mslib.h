@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <cufft.h>
 
 #define MAX_ELEMENT_Z 103
 #define MAX_NUM_ELEMENT 5 // max number of element type in the material

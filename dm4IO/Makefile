@@ -7,13 +7,13 @@ CFLAGS	=
 INCLUDE	= -I$(INSTALL_PATH)/include
 LIBSHDF = $(EXTLIB)
 
-test: pinpointTagsDM4.o main.o 
+test: parseDMx.o main.o 
 	$(CC) $? -o $@ $(LIBSHDF) -lhdf5 
 main.o:
 	$(CC) $(CFLAGS) -c main.c -o $@ $(INCLUDE)
 
 pinpointTagsDM4.o:
-	$(CC) $(CFLAGS) -c pinpointTagsDM4.c -o $@ $(INCLUDE)
+	$(CC) $(CFLAGS) -c parseDMx.c -o $@ $(INCLUDE)
 	 
 
 clean: 

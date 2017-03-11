@@ -11,7 +11,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "hdf5.h"
-#include "pinpointTagsDM4.h"
+#include "parseDMx.h"
 
 
 #define NUM_TARGET_TAGS 5
@@ -226,7 +226,7 @@ int main() {
     if (fpDM4 == NULL)
         printf("No such file!!\n");
     else{
-        pinpointTagsDM4(fpDM4, targetTagsPositions, targetTagsLabels, NUM_TARGET_TAGS);
+        parseDMx(fpDM4, targetTagsPositions, targetTagsLabels, NUM_TARGET_TAGS);
         fclose(fpDM4);
     }
 
