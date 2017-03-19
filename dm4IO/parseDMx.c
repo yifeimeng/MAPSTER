@@ -1,6 +1,7 @@
 //
-//  readDM4.c
+//  parseDMx.c
 //
+//  This subroutine parses the dm3 or dm4 files and finds the starting position of raw data in the file.
 //
 //  Created by Yifei Meng on 1/6/17.
 //
@@ -34,7 +35,7 @@ void readTagData(FILE *fp, uint64_t *infoArray, uint64_t infoArraySize) {
 
     //determine the data type of the tag
     uint64_t tagType = infoArray[0];
-    printf("data type is 0x%llx:",tagType);
+    //printf("data type is 0x%llx:",tagType); // used for debug
 
     //process the tag based on different data type
     switch (tagType) {
@@ -44,7 +45,7 @@ void readTagData(FILE *fp, uint64_t *infoArray, uint64_t infoArraySize) {
             uint64_t entryIndex, entryDataType;
             for (entryIndex = 0; entryIndex < numberEntry; entryIndex++) {
                 entryDataType = infoArray[2*entryIndex+4];
-                printf("(0x%llx):",entryDataType);
+                printf("(0x%lx):",entryDataType);
                 uint64_t tempInfoArray[1] = {infoArray[2*entryIndex+4]};
                 readTagData(fp, tempInfoArray, 1);
 
@@ -57,7 +58,7 @@ void readTagData(FILE *fp, uint64_t *infoArray, uint64_t infoArraySize) {
             if (infoArraySize == 3) {//array of data
                 uint64_t elementDataType = infoArray[1];
                 uint64_t numberElement = infoArray[2];
-                printf("array of 0x%llx, 0x%llx elements",elementDataType, numberElement);
+                printf("array of 0x%lx, 0x%lx elements",elementDataType, numberElement);
                 uint64_t tempInfoArray[1] = {infoArray[1]};
                 for (uint64_t elementIndex = 0; elementIndex < numberElement; elementIndex++){
                     readTagData(fp, tempInfoArray, 1);
@@ -88,74 +89,74 @@ void readTagData(FILE *fp, uint64_t *infoArray, uint64_t infoArraySize) {
         case 0x02: {//the tag is a 2 bytes signed integer
             signed short currValue;
             fread(&currValue, 2, 1, fp);
-            printf("%d",currValue);
+            //printf("%d",currValue);
             break;
         }
         case 0x03: {//the tag is a 4 bytes signed integer
             signed int currValue;
             fread(&currValue, 4, 1, fp);
-            printf("%d",currValue);
+            //printf("%d",currValue);
             break;
         }
         case 0x04: {//the tag is a 2 bytes uint16 integer or an Unicode character (UTF-16)
             uint16_t currValue;
             fread(&currValue, 2, 1, fp);
-            printf("%d",currValue);
+            // printf("%d",currValue);
             break;
         }
         case 0x05: {//the tag is a 4 bytes uint32 integer
             uint32_t currValue;
             fread(&currValue, 4, 1, fp);
-            printf("%d",currValue);
+            //printf("%d",currValue);
             break;
         }
         case 0x06: {//the tag is a 4 bytes float number
             float currValue;
             fread(&currValue, 4, 1, fp);
-            printf("%f",currValue);
+            //printf("%f",currValue);
             break;
         }
         case 0x07: {//the tag is a 8 bytes double-precesion float number
             double currValue;
             fread(&currValue, 8, 1, fp);
-            printf("%f",currValue);
+            //printf("%f",currValue);
             break;
         }
         case 0x08: {//the tag is a 1 byte boolean number
             char currValue;
             fread(&currValue, 1, 1, fp);
-            printf("%d",currValue);
+            //printf("%d",currValue);
             break;
         }
         case 0x09: {//the tag is a 1 byte char
             char currValue;
             fread(&currValue, 1, 1, fp);
-            printf("%c",currValue);
+            //printf("%c",currValue);
             break;
         }
         case 0x0a:{//the tag is a 1 byte integer,
             char currValue;
             fread(&currValue, 1, 1, fp);
-            printf("%d", currValue);
+            //printf("%d", currValue);
             break;
         }
         case 0x0b: {//the tag is a 8 bytes integer, not clear signed or unsigned
             uint64_t currValue;
             fread(&currValue, 8, 1, fp);
-            printf("%llu",currValue);
+            //printf("%llu",currValue);
             break;
         }
         case 0x0c: {//the tag is a 8 bytes unknown data type
             uint64_t currValue;
             fread(&currValue, 8, 1, fp);
-            printf("%llu",currValue);
+            //printf("%llu",currValue);
             break;
         }
         default:
-            printf("Unknown data type!");
+            //printf("Unknown data type!");
             break;
     }
-    printf("\n");
+    //printf("\n");
 }
 
 void readTag(FILE *fp, uint32_t versionNumber) {
@@ -187,6 +188,7 @@ void readTag(FILE *fp, uint32_t versionNumber) {
     else if (versionNumber == 3) {
         fread(&fourBytes, 4, 1, fp);
         infoArraySize = (uint64_t)swapBytesUnsigned32(fourBytes);
+	printf("info array size is %lu.\n", infoArraySize);
         uint64_t infoArray[infoArraySize];
         // read the 4-byte integer one by one, and convert it into 8-byte
         for (uint64_t i = 0; i < infoArraySize; i ++) {
@@ -199,7 +201,7 @@ void readTag(FILE *fp, uint32_t versionNumber) {
 
     }
 
-    
+
 
 
     printf("\n");
@@ -232,7 +234,7 @@ void readTagEntry(FILE *fp, uint32_t versionNumber, uint64_t tagIndex, uint32_t 
     else {
         //tag name doesn't exist.
         char tagIndexLabel[10];//use the current tag index as the name of this unnamed tag
-        sprintf(tagIndexLabel, "%llu", tagIndex);
+        sprintf(tagIndexLabel, "%lu", tagIndex);
         strcat(tagLabel,tagIndexLabel);
         strcat(tagLabel,"->");//add the indication of the next level
         printf("%s\n",tagLabel);
@@ -315,7 +317,7 @@ void readTagGroup(FILE *fp, uint32_t versionNumber, uint32_t tagLevel, char *tag
         fread(&fourBytes, 4, 1, fp);
         numberTags = (uint64_t)swapBytesUnsigned32(fourBytes);
     }
-    printf("%llu tags in this directory.\n",numberTags);
+    printf("%lu tags in this directory.\n",numberTags);
 
     //read all tags
     for (uint64_t tagIndex = 0;tagIndex < numberTags;tagIndex++) {
@@ -348,7 +350,7 @@ void parseDMx(FILE *fp, int64_t *targetTagsPositions, char **targetTagsLabels, u
         printf("This file is not supported!\n");
         return;
     }
-    printf("The file size is %llu bytes\n", fileSize);
+    printf("The file size is %lu bytes\n", fileSize);
 
     //read the order of bytes, 1 is little endian (LE), 0 is big endian (BE)
     uint32_t byteOrder;

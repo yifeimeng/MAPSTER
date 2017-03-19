@@ -7,13 +7,21 @@ CFLAGS	=
 INCLUDE	= -I$(INSTALL_PATH)/include
 LIBSHDF = $(EXTLIB)
 
-test: parseDMx.o main.o 
-	$(CC) $? -o $@ $(LIBSHDF) -lhdf5 
-main.o:
-	$(CC) $(CFLAGS) -c main.c -o $@ $(INCLUDE)
+dm2h5: dm2h5.o parseDMx.o
+	$(CC) $? -o $@ $(LIBSHDF) -lhdf5
 
-pinpointTagsDM4.o:
+sample: parseDMx.o sample.o 
+	$(CC) $? -o $@
+
+sample.o:
+	$(CC) $(CFLAGS) -c sample.c -o $@ $(INCLUDE)
+
+dm2h5.o: 
+	$(CC) $(CFLAGS) -c dm2h5.c -o $@ $(INCLUDE)
+
+parseDMx.o:
 	$(CC) $(CFLAGS) -c parseDMx.c -o $@ $(INCLUDE)
+
 	 
 
 clean: 
