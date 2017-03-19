@@ -1,0 +1,52 @@
+Device used for calculation
+    0
+Output filename
+    srruo3
+Input crystal file name
+    SrRuO3-[110]-modify5-1-1-25-muSTEM.xtl
+Slice unit cell <1> yes <2> no
+    1
+Number of distinct potentials
+    102
+<1> manual or <2> auto slicing
+    2
+Thickness
+    200.07
+Scattering factor accuracy
+    2
+Calculation type
+    2
+Cs coefficient
+    0.000000
+C5 coefficient
+    0.000000
+aperture cutoff
+    5
+Defocus
+    0.000000
+Change probe lens parameters
+    0
+<1> QEP <2> ABS
+    2
+<1> Absorption <2> No absorption
+    1
+Tile supercell x
+    24
+Tile supercell y
+    12
+Number of pixels in x
+    256
+Number of pixels in y
+    256
+<1> Continue <2> Change
+    1
+<1> Beam tilt <2> No beam tilt
+    2
+<1> Specimen tilt <2> No specimen tilt
+    2
+<0> continue <1> save <2> load
+    0
+<1> CBED <2> PACBED <3> STEM
+    2
+<1> Diffraction pattern for each probe position
+    0

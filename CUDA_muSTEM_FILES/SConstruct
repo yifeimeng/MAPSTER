@@ -1,0 +1,3 @@
+import os
+env = Environment(ENV = {'PATH' : os.environ['PATH']}, F90 = 'pgfortran', F90FLAGS = '-Mfree -Mcuda -Mpreprocess -Ddouble_precision=1', LINK = 'pgfortran', LINKFLAGS = '-Mcuda', LIBPATH = '/opt/pgi/linux86-64/2016/cuda/7.5/lib64', LIBS = ['cuda', 'cudart', 'cufft'])
+env.Program('mu_STEM', Glob('*.f90'))

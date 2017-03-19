@@ -1,0 +1,54 @@
+Device used for calculation
+    0
+Output filename
+    HRTEM_example
+Input crystal file name
+    SrTiO3_001_300keV.xtl
+Slice unit cell <1> yes <2> no
+    1
+Number of distinct potentials
+    2
+<1> manual or <2> auto slicing
+    1
+depths
+    0.000000
+depths
+    0.5000000
+Thickness
+    200.0000
+Scattering factor accuracy
+    1
+Calculation type
+    1
+<1> QEP <2> ABS
+    2
+<1> Absorption <2> No absorption
+    1
+Tile supercell x
+    1
+Tile supercell y
+    1
+Number of pixels in x
+    128
+Number of pixels in y
+    128
+<1> Continue <2> Change
+    1
+<1> Beam tilt <2> No beam tilt
+    2
+<1> Specimen tilt <2> No specimen tilt
+    2
+<0> continue <1> save <2> load
+    0
+Cs coefficient
+    1.200000
+C5 coefficient
+    0.000000
+aperture cutoff
+    9.610000
+Defocus
+    -561.2400
+Change imaging lens parameters
+    0
+<0> Precalculated potentials <1> On-the-fly calculation
+    0

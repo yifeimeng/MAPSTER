@@ -1,0 +1,52 @@
+Device used for calculation
+0
+Output filename
+test_output
+Input crystal file name
+SrTiO3_001_300keV.xtl
+Slice unit cell <1> yes <2> no
+1
+Number of distinct potentials
+2
+<1> manual or <2> auto slicing
+2
+Thickness
+200
+Scattering factor accuracy
+1
+Calculation type
+2
+Cs coefficient
+0
+C5 coefficient
+0
+aperture cutoff
+9.5
+Defocus
+0
+Change probe lens parameters
+0
+<1> QEP <2> ABS
+2
+<1> Absorption <2> No absorption
+1
+Tile supercell x
+8
+Tile supercell y
+8
+Number of pixels in x
+256
+Number of pixels in y
+256
+<1> Continue <2> Change
+1
+<1> Beam tilt <2> No beam tilt
+2
+<1> Specimen tilt <2> No specimen tilt
+2
+<0> continue <1> save <2> load
+0
+<1> CBED <2> PACBED <3> STEM
+2
+<1> Diffraction pattern for each probe position
+0

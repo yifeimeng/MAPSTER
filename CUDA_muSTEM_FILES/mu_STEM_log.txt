@@ -1,0 +1,310 @@
+ |----------------------------------------------------------------------------|
+ |              Melbourne University (scanning) transmission electron         |
+ |                            microscopy computing suite                      |
+ |      __       __  __    __   ______  ________  ________  __       __       |
+ |     |       /  |    |   /      |        |        |       /        |
+ |     | $$   /  $$| $$  | $$|  $$$$$$\$$$$$$$$| $$$$$$$$| $$   /  $$      |
+ |     | $$$ /  $$$| $$  | $$| $$___$$  | $$   | $$__    | $$$ /  $$$      |
+ |     | $$$$  $$$$| $$  | $$ $$       | $$   | $$     | $$$$  $$$$      |
+ |     | $$$$ $$ $$| $$  | $$ _$$$$$$  | $$   | $$$$$   | $$$$ $$ $$      |
+ |     | $$ $$$| $$| $$__/ $$|  __| $$  | $$   | $$_____ | $$ $$$| $$      |
+ |     | $$  $ | $$ $$    $$ $$    $$  | $$   | $$     | $$  $ | $$      |
+ |      $$      $$  $$$$$$   $$$$$$    $$    $$$$$$$$ $$      $$      |
+ |                                                                            |
+ |    This software may only be used for non-commercial academic purposes.    |
+ |   Copyright 2016 A.J. Dalfonso, S.D. Findlay, B. D. Forbes and L.J. Allen. |
+ |      The University of Melbourne, Parkville 3010, Victoria, Australia.     |
+ |           No warranties of any kind are given or implied.                  |
+ |                       email: a.j@dalfonso.com.au                           |
+ |                                                                            |
+ |                                                                            |
+ |    Version 4.5                                                             |
+ |                                                                            |
+ |    Note: pass the argument "nopause" (without quotation marks)             |
+ |          e.g. muSTEM.exe nopause                                           |
+ |          to avoid pauses.                                                  |
+ |                                                                            |
+ |----------------------------------------------------------------------------|
+
+  Press enter to continue.
+ |----------------------------------|
+ |        CPU multithreading        |
+ |----------------------------------|
+ 
+ The number of threads being used on the CPU is: 12
+ 
+ |----------------------------------|
+ |           GPU selection          |
+ |----------------------------------|
+ 
+ You have one CUDA-capable device, with the following properties:
+ 
+ Device Number: 0
+   Device name: Quadro M5000
+   Memory Clock Rate (MHz): 3305
+   Memory Bus Width (bits): 256
+   Peak Memory Bandwidth (GB/s): 211.52
+   Total Global Memory (MB):    8506.44
+   Compute capability: 5.2
+ 
+ Enter <0> to continue.
+ >  0
+ 
+ |------------------------------|
+ |        Dataset output        |
+ |------------------------------|
+ 
+ Enter the prefix for all outputted filenames:
+ >  HRTEM_example
+ 
+ |--------------------------------|
+ |        Specimen details        |
+ |--------------------------------|
+ 
+ Please enter the name of the input .xtl file.
+ >  SrTiO3_001_300keV.xtl
+
+  Strontium Titanate 
+     a =    3.9050       b =    3.9050      c =    3.9050 è
+ alpha =   90.0000    beta =   90.0000  gamma =   90.0000 degrees
+
+ Incident beam energy =      300.000 keV
+
+ Number of atom atom types =  3
+
+ Type  1  Sr                Z =   38.
+ Occupancy =  1.000   <us> ** 2 =  0.78700E-02
+
+      x         y         z
+
+    1  0.000000  0.000000  0.000000
+ Type  2  O                  Z =    8.
+ Occupancy =  1.000   <us> ** 2 =  0.92750E-02
+
+      x         y         z
+
+    1  0.500000  0.500000  0.000000
+    2  0.500000  0.000000  0.500000
+    3  0.000000  0.500000  0.500000
+ Type  3  Ti                Z =   22.
+ Occupancy =  1.000   <us> ** 2 =  0.55700E-02
+
+      x         y         z
+
+    1  0.500000  0.500000  0.500000
+ Zone Axis = [    0   0   1 ]
+ X-scan reciprocal lattice vector = (    1   0   0 )
+ Y-scan reciprocal lattice vector = (    0   1   0 )
+ Successfully read all atomic X-ray scattering factors
+ from D. Waasmaier & A. Kirfel Acta. Cryst. A51, 416 (1995)
+ Mott formula used for conversion to electron form factors
+
+
+ Inner potential =   21.8466409     volts
+ Pertinent quantities for the crystal:
+          E =      300.000 keV
+ Crystal Ko =      50.79748532     è-1 (1/lambda)
+  Vacuum Ko =      50.79521613     è-1 (1/lambda)
+   Delta Ko =     0.2269190648E-02 è-1 (1/lambda)
+     m* / m =   1.5871     (relativistic mass increment)
+
+
+ |-------------------------------|
+ |      Unit cell slicing        |
+ |-------------------------------|
+ 
+ Do you wish to slice the unit cell in the beam direction?
+ This may be a good idea if the unit cell is larger than 2 è
+ in the z-direction.
+ <1> Yes <2> No 
+ >  1
+ 
+ Enter the number of slices per unit cell in the beam direction:
+ >  2
+ 
+ You will now be asked to enter the depths at which slicing
+ will take place. These should be entered as fractions of
+ the unit cell. It is the front of the slice which should
+ be entered. (e.g. three even slices would be entered as
+ 0.0, 0.3333, 0.6666 ).
+
+ How would you like to specify the slice depths?
+ <1> Manually 
+ <2> Automatically (uniformly spaced)
+ >  1
+ 
+ Enter the fractional depth of slice number    1:   >  0.000000
+ Enter the fractional depth of slice number    2:   >  0.5000000
+ 
+ |-------------------------------|
+ |      Specimen thickness       |
+ |-------------------------------|
+ 
+ Enter the specimen thickness in Angstroms:
+ >  200.0000
+ 
+ This corresponds to    51 unit cells with a total thickness of  199.2 è.
+ 
+ |------------------------------------------|
+ |      Potential calculation method        |
+ |------------------------------------------|
+ 
+ Two choices are available for the calculation of potentials.
+ The reciprocal space method is accurate but may be slower.
+ The hybrid method due to Van den Broek et al. is faster but
+ is an approximate approach. Note that if "on-the-fly"
+ scattering potentials are used the calculation defaults to the
+ hybrid approach. 
+ (Van den Broek et al., Ultramicroscopy 158 (2015) pp. 89-97)
+ 
+ Note: if there is insufficient GPU memory, this choice will be overridden.
+ 
+ Please choose a method:
+ <1> Reciprocal space (accuracy)
+ <2> Hybrid (speed)
+ >  1
+ 
+ |----------------------------|
+ |        Illumination        |
+ |----------------------------|
+ 
+ <1> Plane wave      (including HRTEM images and diffraction patterns)
+ <2> Convergent-beam (including STEM images and CBED patterns)
+ >  1
+ 
+ |----------------------------------------|
+ |        Thermal scattering model        |
+ |----------------------------------------|
+ 
+ <1> Quantum Excitation of Phonons (QEP) model
+      (includes thermal intensity component)
+ <2> Absorptive model
+      (only includes absorption from elastic wave function)
+ >  2
+ 
+ You can choose to omit the absorptive potential
+ so that only a thermally smeared elastic potential
+ is used (typically just for checking numerics).
+ <1> Include absorption
+ <2> Do not include absorption
+ >  1
+ 
+ |------------------------------------------|
+ |      Unit cell tiling and grid size      |
+ |------------------------------------------|
+ 
+ Enter the integer by which to tile the unit cell in the x direction:
+ >  1
+ Enter the integer by which to tile the unit cell in the y direction:
+ >  1
+ 
+ Enter number of pixels in the x direction:
+ >  128
+ Enter number of pixels in the y direction:
+ >  128
+ 
+                                x               y
+ ---------------------------------------------------------
+ Pixels per unit cell  |           128 |           128
+ Tiling of unit cell   |             1 |             1
+ Pixels in super cell  |           128 |           128
+ Max scattering vector |      10.9 è-1 |      10.9 è-1
+                       | ( 211.9 mrad) | ( 211.9 mrad)
+ ---------------------------------------------------------
+ <1> Continue
+ <2> Change
+ >  1
+ 
+ The illumination can be tilted off the beam axis.
+ <1> Beam tilt
+ <2> No beam tilt
+ >  2
+ 
+ The specimen can be tilted off the specimen axis.
+ <1> Specimen tilt
+ <2> No specimen tilt
+ >  2
+ 
+ |---------------------------------------------|
+ |      Save/load transmission functions       |
+ |---------------------------------------------|
+ 
+ Warning: the files outputted when saving may be very large.
+ 
+ <0> Proceed without saving or loading
+ <1> Save transmission functions
+ <2> Load transmission functions
+ >  0
+ 
+ |------------------------------------------|
+ |      Image forming lens parameters       |
+ |------------------------------------------|
+ 
+  Enter the coefficient of spherical aberration (Cs) in mm:
+ >  1.200000
+ 
+  Enter the coefficient of fifth order spherical aberration (C5) in mm:
+ >  0.000000
+ 
+ Enter the aperture cutoff in mrad:
+ (The optimal cutoff for the specified Cs is    9.61 mrad)
+ >  9.610000
+ 
+ Enter the defocus in Angstroms:
+ (The optimal Scherzer defocus for the specified Cs is -561.24 Angstroms)
+ >  -561.2400
+ 
+ Current simulation parameters:
+ -----------------------------------------------
+ <1> Aperture cutoff (mrad)              9.610    
+     Aperture cutoff (è^-1)             0.4882    
+ <2> Defocus         (è)                -561.2    
+ <3> Cs              (mm)                1.200    
+ <4> C5              (mm)                0.000    
+ -----------------------------------------------
+ Select option to change any parameter or <0> to continue
+ >  0
+ 
+ |-----------------------|
+ |      GPU memory       |
+ |-----------------------|
+ 
+ This calculation requires a GPU with roughly     0.786 MB of memory.
+ The selected device has access to     8506.441      MB of memory.
+ 
+ It appears that the selected GPU device satisfies this requirement,
+ and thus the calculations can proceed using precalculated potentials.
+ However, in the event that the code still crashes, the user may wish
+ to force on-the-fly calculation of potentials to see if that helps.
+ 
+ Warning: issues have been reported with on-the-fly calculations
+ and non-square arrays.
+ 
+ <0> Precalculated potentials
+ <1> On-the-fly calculation
+ >  0
+ 
+ |----------------------------------|
+ |      Pre-calculation setup       |
+ |----------------------------------|
+ 
+ Calculating absorptive scattering factor    1 of   93... Calculating absorptive scattering factor    2 of   93... Calculating absorptive scattering factor    3 of   93... Calculating absorptive scattering factor    4 of   93... Calculating absorptive scattering factor    5 of   93... Calculating absorptive scattering factor    6 of   93... Calculating absorptive scattering factor    7 of   93... Calculating absorptive scattering factor    8 of   93... Calculating absorptive scattering factor    9 of   93... Calculating absorptive scattering factor   10 of   93... Calculating absorptive scattering factor   11 of   93... Calculating absorptive scattering factor   12 of   93... Calculating absorptive scattering factor   13 of   93... Calculating absorptive scattering factor   14 of   93... Calculating absorptive scattering factor   15 of   93... Calculating absorptive scattering factor   16 of   93... Calculating absorptive scattering factor   17 of   93... Calculating absorptive scattering factor   18 of   93... Calculating absorptive scattering factor   19 of   93... Calculating absorptive scattering factor   20 of   93... Calculating absorptive scattering factor   21 of   93... Calculating absorptive scattering factor   22 of   93... Calculating absorptive scattering factor   23 of   93... Calculating absorptive scattering factor   24 of   93... Calculating absorptive scattering factor   25 of   93... Calculating absorptive scattering factor   26 of   93... Calculating absorptive scattering factor   27 of   93... Calculating absorptive scattering factor   28 of   93... Calculating absorptive scattering factor   29 of   93... Calculating absorptive scattering factor   30 of   93... Calculating absorptive scattering factor   31 of   93... Calculating absorptive scattering factor   32 of   93... Calculating absorptive scattering factor   33 of   93... Calculating absorptive scattering factor   34 of   93... Calculating absorptive scattering factor   35 of   93... Calculating absorptive scattering factor   36 of   93... Calculating absorptive scattering factor   37 of   93... Calculating absorptive scattering factor   38 of   93... Calculating absorptive scattering factor   39 of   93... Calculating absorptive scattering factor   40 of   93... Calculating absorptive scattering factor   41 of   93... Calculating absorptive scattering factor   42 of   93... Calculating absorptive scattering factor   43 of   93... Calculating absorptive scattering factor   44 of   93... Calculating absorptive scattering factor   45 of   93... Calculating absorptive scattering factor   46 of   93... Calculating absorptive scattering factor   47 of   93... Calculating absorptive scattering factor   48 of   93... Calculating absorptive scattering factor   49 of   93... Calculating absorptive scattering factor   50 of   93... Calculating absorptive scattering factor   51 of   93... Calculating absorptive scattering factor   52 of   93... Calculating absorptive scattering factor   53 of   93... Calculating absorptive scattering factor   54 of   93... Calculating absorptive scattering factor   55 of   93... Calculating absorptive scattering factor   56 of   93... Calculating absorptive scattering factor   57 of   93... Calculating absorptive scattering factor   58 of   93... Calculating absorptive scattering factor   59 of   93... Calculating absorptive scattering factor   60 of   93... Calculating absorptive scattering factor   61 of   93... Calculating absorptive scattering factor   62 of   93... Calculating absorptive scattering factor   63 of   93... Calculating absorptive scattering factor   64 of   93... Calculating absorptive scattering factor   65 of   93... Calculating absorptive scattering factor   66 of   93... Calculating absorptive scattering factor   67 of   93... Calculating absorptive scattering factor   68 of   93... Calculating absorptive scattering factor   69 of   93... Calculating absorptive scattering factor   70 of   93... Calculating absorptive scattering factor   71 of   93... Calculating absorptive scattering factor   72 of   93... Calculating absorptive scattering factor   73 of   93... Calculating absorptive scattering factor   74 of   93... Calculating absorptive scattering factor   75 of   93... Calculating absorptive scattering factor   76 of   93... Calculating absorptive scattering factor   77 of   93... Calculating absorptive scattering factor   78 of   93... Calculating absorptive scattering factor   79 of   93... Calculating absorptive scattering factor   80 of   93... Calculating absorptive scattering factor   81 of   93... Calculating absorptive scattering factor   82 of   93... Calculating absorptive scattering factor   83 of   93... Calculating absorptive scattering factor   84 of   93... Calculating absorptive scattering factor   85 of   93... Calculating absorptive scattering factor   86 of   93... Calculating absorptive scattering factor   87 of   93... Calculating absorptive scattering factor   88 of   93... Calculating absorptive scattering factor   89 of   93... Calculating absorptive scattering factor   90 of   93... Calculating absorptive scattering factor   91 of   93... Calculating absorptive scattering factor   92 of   93... Calculating absorptive scattering factor   93 of   93... 
+ 
+ Kinematic mean free path for TDS =     115.92 è
+ 
+ Calculating scattering factors...
+ 
+ Calculating transmission functions for slice 1/2...
+ Number of atoms in this slice: 2
+
+ Calculating transmission functions for slice 2/2...
+ Number of atoms in this slice: 3
+
+ The calculation of transmission functions for the absorptive model took  
+    1.000000000000000      seconds.
+ 
+ |--------------------------------|
+ |      Calculation running       |
+ |--------------------------------|
+ 
+ Cell:     1 Intensity:     0.998599 Cell:     2 Intensity:     0.997050 Cell:     3 Intensity:     0.995218 Cell:     4 Intensity:     0.993012 Cell:     5 Intensity:     0.990370 Cell:     6 Intensity:     0.987249 Cell:     7 Intensity:     0.983627 Cell:     8 Intensity:     0.979501 Cel
