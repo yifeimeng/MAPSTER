@@ -10,8 +10,7 @@ Base = declarative_base()
 class Sample(Base):
 	__tablename__ = 'sample'
 	id = Column(Integer, primary_key = True)
-	name = Column(String(10), nullable = False)
-	crystal_file = Column(String(50))
+    crystal_file = Column(String(40), primary_key = True)
 	var_1 = Column(Float)
 	var_2 = Column(Float)
 	var_3 = Column(Float)
@@ -39,6 +38,8 @@ class Parameter(Base):
 	# Sample parameters
 	sample_id = Column(Integer, ForeignKey('sample.id'))
 	sample = relationship(Sample)
+    # Image file name
+    img_name = Column(String(20))
 
 engine = create_engine('sqlite:///sqlalchemy_test.db', echo = True)
 

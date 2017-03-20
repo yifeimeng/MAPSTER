@@ -1,36 +1,52 @@
 import subprocess
+import msParam.py
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
+from sqlalchemy_declarative import Base, Sample, Parameter
 
-param = {'Device': 0}
-param['output_name'] = 'test_output'
-param['crystal_file_name'] = "SrTiO3_001_300keV.xtl"
-param['num_slices'] = 2
-param['thickness'] = 200
-param['potential_method'] = 1 # 1 is reciprocal space method (accuracy), 2 is hybrid method (speed)
-param['beam_type'] = 2 # 1 is parallel beam, 2 is convergent beam
-param['Cs'] = 0
-param['C5'] = 0
-param['convergence_angle'] = 9.5
-param['defocus'] = 0
-param['tds_method'] = 2 # 1 is qep, 2 is absorption model
-param['absorp_choice'] = 1 # 1 is absorption, 2 is no absorption
-param['tile_x'] = 8
-param['tile_y'] = 8
-param['pixel_x'] = 256
-param['pixel_y'] = 256
-param['output_type'] = 2 # convergent beam only, 1 is CBED, 2 is PACBED, 3 is STEM
+engine = create_engine('sqlite:///sqlalchemy_test.db')
+Base.metadata.bind = engine
 
+DBSession = sessionmaker(bind = engine)
+session = DBSession()
+
+# initilize an instance of Param
+currParam = Param()
 
 print('Start batch job...')
 #create the parameter file, define the file name here
-file_param = open('input_parameter.txt', 'w+')
 
-writeParameterFile(file_param, param)
+convergence_angle_list = [3.5, 5, 10, 17]
+num_xtl_file = 20
 
-file_param.close()
+#load the sample information into the Sample table
+for i in range(0, num_xtl_file)
+     new_sample = Sample(id = i, crystal_file = 'BTO_GSO_100' + '_' + str(i) + '.xtl', var_1 = j)
+     session.add(new_sample)
+     session.commit()
+
+for i in range(len(convergence_angle_list))
+    # update the parameter
+    currParam.convergence_angle = convergence_angle_list[i]
+    for j in range(0, num_xtl_file)
+        # update the sample
+        currParam.crystal_file_name = 'BTO_GSO_100' + '_' + str(i) + '.xtl'
+        
+        # define the output prefix
+        currParam.output_name = 'BTO_GSO' + '_p' + str(i) + '_s' + str(j)
+        # perform the calculation
+        currParam.writeParam()
+        subprocess.call("./mu_STEM nopause")
+        
+        # load the parameter information into the Parameter table, considering the automatic thickness calculation
+        for i_thickness in range(0, n_thickness)
+            currThickness =
+            new_parameter = currParam.createParameter()
+            session.add(new_parameter)
+            session.commit()
 
 
-subprocess.call("./mu_STEM nopause")
 
 
 

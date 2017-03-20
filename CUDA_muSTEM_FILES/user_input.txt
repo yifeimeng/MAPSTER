@@ -1,2 +1,2 @@
 play
-input_parameter.txt
+input_param.txt

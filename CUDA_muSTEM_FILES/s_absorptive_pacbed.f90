@@ -23,7 +23,9 @@
         complex(fp_kind) :: psi(nopiy,nopix)
       
         !output/detectors
-        real(fp_kind),dimension(nopiy, nopix) :: pacbed_pattern,fourDSTEM_pattern
+        integer(4) :: n_thickness, i_totalSlice, i_thickness
+        n_thickness = n_cells*n_slices/8
+        real(fp_kind),dimension(n_thickness, nopiy, nopix) :: pacbed_pattern,fourDSTEM_pattern
 
         !diagnostic variables
         real(fp_kind) :: intensity, t1, delta
@@ -75,13 +77,24 @@
                         
                         call fft2(nopiy, nopix, psi, nopiy, psi, nopiy)
                         psi = prop(:,:,i_slice) * psi
+
+                        i_totalSlice = (i_cell - 1) * n_slices + i_slice
+                        if (MOD(i_totalSlice, 8) == 0) then
+
+                            i_thickness = i_totalSlice/8
+                            fourDSTEM_pattern(i_thickness, :, :) = abs(psi)**2
+
+                        endif
+
                         call ifft2(nopiy, nopix, psi, nopiy, psi, nopiy)
+
+
                   enddo
             enddo
             
-            call fft2(nopiy, nopix, psi, nopiy, psi, nopiy)
-			fourDSTEM_pattern = abs(psi)**2
-            pacbed_pattern = pacbed_pattern + fourDSTEM_pattern
+            do i_thickness = 1, n_thickness
+                    pacbed_pattern(i_thickness, :, :) = pacbed_pattern(i_thickness, :, :) + fourDSTEM_pattern(i_thickness, :, :)
+            enddo
 
 			!Output 4D STEM diffraction pattern
 			if(fourDSTEM) then
@@ -89,7 +102,7 @@
 					call binary_out_unwrap(nopiy, nopix, fourDSTEM_pattern, filename,write_to_screen=.false.)
 			endif
             
-            intensity = sum(fourDSTEM_pattern)
+            intensity = sum(fourDSTEM_pattern)/n_thickness
         enddo
         enddo
       
@@ -113,9 +126,15 @@
             write(*,*) 'The following files were outputted (as 32-bit big-endian floating point):'
 	    endif
         write(*,*)
-    
-        filename = trim(adjustl(output_prefix)) // '_PACBED_Pattern'
-        call binary_out_unwrap(nopiy,nopix,pacbed_pattern,filename)
+
+        character(10) :: thickness_label
+
+        do i_thickness = 1, n_thickness
+            write(thickness_label, *) i_thickness
+            thickness_label = adjustl(thickness_label)
+            filename = trim(adjustl(output_prefix)) // '_' // thickness_label
+            call binary_out_unwrap(nopiy,nopix,pacbed_pattern,filename)
+        enddo
       
         deallocate(transf_absorptive,prop) !deallocate large arrays
 

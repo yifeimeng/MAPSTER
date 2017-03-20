@@ -27,7 +27,7 @@ int main() {
     
     unitCell = (float *)malloc(sizeof(float)*4*MAX_NUM_ATOM);
     cp = (cell_param *)malloc(sizeof(cell_param));
-    fp = fopen("SrRuO3-62-[110]-supercell-113.cif", "r");
+    fp = fopen("SrRuO3-62/SrRuO3-[110]-modify5-1-1-25.cif", "r");
     if (fp == NULL) {
         printf("File not found!\n");
         return 0;
@@ -54,10 +54,10 @@ int main() {
     cp_super->beta = 90;
     cp_super->gamma = 90;
     
-    fp_o = fopen("SrRuO3-62-[110]-supercell-113.xyz", "w");
+    fp_o = fopen("SrRuO3-62/SrRuO3-[110]-modify5-1-1-25.xyz", "w");
     printCellXYZ(fp_o, unitCell, numAtom);
     
-    fp_o2 = fopen("SrRuO3-62-[110]-supercell-113-muSTEM.xtl", "w");
+    fp_o2 = fopen("SrRuO3-62/SrRuO3-[110]-modify5-1-1-25-muSTEM.xtl", "w");
     angstrom2Cell(unitCell, numAtom, cp_super);
     printCellXTL_muSTEM(fp_o2, unitCell, numAtom, cp_super);
     

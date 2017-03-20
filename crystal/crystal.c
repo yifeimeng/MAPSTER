@@ -8,6 +8,7 @@ uint32_t name2Z(char *name) {
     if (strcmp(name, "Sr") == 0) return 38;
     if (strcmp(name, "Ru") == 0) return 44;
     if (strcmp(name, "O") == 0) return 8;
+    if (strcmp(name, "Ti") == 0) return 22;
     
     return 0;
 }
@@ -23,6 +24,9 @@ void Z2name(uint32_t Z, char *name) {
             break;
         case 8:
             strcpy(name, "O");
+            break;
+        case 22:
+            strcpy(name, "Ti");
             break;
         default:
             strcpy(name, "NA");
@@ -253,6 +257,10 @@ void printCellXTL_muSTEM(FILE *fp, float *cell, uint32_t numAtom, cell_param *cp
     
     free(elementName);
     
+    fprintf(fp, "Orientation\n");
+    fprintf(fp, "0 0 1\n");
+    fprintf(fp, "1 0 0\n");
+    fprintf(fp, "0 1 0\n");
 
 }
 
