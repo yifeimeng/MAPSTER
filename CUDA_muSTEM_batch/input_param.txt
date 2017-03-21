@@ -1,0 +1,52 @@
+Device used for calculation
+0
+Output filename
+BTO_GSO_p2_s5
+Input crystal file name
+BTO_GSO_100_var_2.xtl
+Slice unit cell <1> yes <2> no
+1
+Number of distinct potentials
+2
+<1> manual or <2> auto slicing
+2
+Thickness
+500
+Scattering factor accuracy
+1
+Calculation type
+2
+Cs coefficient
+0
+C5 coefficient
+0
+aperture cutoff
+10
+Defocus
+0
+Change probe lens parameters
+0
+<1> QEP <2> ABS
+2
+<1> Absorption <2> No absorption
+1
+Tile supercell x
+10
+Tile supercell y
+10
+Number of pixels in x
+256
+Number of pixels in y
+256
+<1> Continue <2> Change
+1
+<1> Beam tilt <2> No beam tilt
+2
+<1> Specimen tilt <2> No specimen tilt
+2
+<0> continue <1> save <2> load
+0
+<1> CBED <2> PACBED <3> STEM
+2
+<1> Diffraction pattern for each probe position
+0

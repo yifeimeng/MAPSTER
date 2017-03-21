@@ -1,0 +1,4 @@
+The calculation of transmission functions for the absorptive model took     1.000000000000000    seconds.
+
+The multislice calculation took     18.00000000000000    seconds.
+
